@@ -1,0 +1,8 @@
+/* Inject parse_args() switch handling in src/binutils/ld/lexsup.c. */
+
+#define X(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD) \
+  case OPTION_##ENUM_ID: \
+    command_line.ARGS_FIELD = optarg; \
+    break;
+#include "ldjson_options.def"
+#undef X

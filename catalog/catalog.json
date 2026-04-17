@@ -1,0 +1,29 @@
+﻿{
+    "schema_type":  "CatalogIndex",
+    "schema_version":  1,
+    "profiles":  [
+                     "profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json",
+                     "profiles/st_gnu_tools_for_stm32_14_3_rel1.json"
+                 ],
+    "patch_recipes":  [
+                          "recipes/patch/json_patch_v10_st_ld.json",
+                          "recipes/patch/json_patch_v10_st_ld_14_3_rel1.json"
+                      ],
+    "build_recipes":  [
+                          "recipes/build/msys2_mingw64_st_ld_13_3_verified.json",
+                          "recipes/build/msys2_mingw64_st_ld_14_3_verified.json"
+                      ],
+    "verify_recipes":  [
+                           "recipes/verify/sanity_cli.json",
+                           "recipes/verify/json_smoke_self_contained.json"
+                       ],
+    "schemas":  [
+                    "schemas/version_profile.schema.json",
+                    "schemas/patch_recipe.schema.json",
+                    "schemas/build_recipe.schema.json",
+                    "schemas/verify_recipe.schema.json",
+                    "schemas/detection_result.schema.json",
+                    "schemas/patch_validation_result.schema.json",
+                    "schemas/execution_report.schema.json"
+                ]
+}

@@ -1,0 +1,8 @@
+/* Inject into enum option_values in src/binutils/ld/ldlex.h.
+ * This tree: place directly after the default-script enum entry.
+ */
+
+#define X(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD) \
+  OPTION_##ENUM_ID,
+#include "ldjson_options.def"
+#undef X

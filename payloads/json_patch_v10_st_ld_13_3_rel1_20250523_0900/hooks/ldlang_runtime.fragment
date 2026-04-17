@@ -1,0 +1,3 @@
+/* Inject the runtime JSON dump hook in lang_process(). */
+
+lang_dump_script_json ();

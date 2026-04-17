@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ld-patcher.local/schemas/patch_recipe.schema.json",
+  "title": "PatchRecipe",
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "id",
+    "display_name",
+    "description",
+    "status",
+    "patch_package",
+    "required_files",
+    "applicability_checks",
+    "operations",
+    "backup_policy",
+    "idempotency_rules",
+    "post_apply_checks",
+    "rollback_strategy"
+  ],
+  "properties": {
+    "schema_type": { "const": "PatchRecipe" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "enabled": { "type": "boolean" },
+    "id": { "type": "string" },
+    "display_name": { "type": "string" },
+    "description": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["verified_local", "candidate", "draft"]
+    },
+    "supported_families": { "type": "array", "items": { "type": "string" } },
+    "patch_package": {
+      "type": "object",
+      "required": ["id", "required_files"],
+      "anyOf": [
+        { "required": ["root_hint"] },
+        { "required": ["root_hints"] }
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "root_hint": { "type": "string" },
+        "root_hints": { "type": "array", "items": { "type": "string" } },
+        "required_files": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "required_files": { "type": "array", "items": { "type": "string" } },
+    "optional_files": { "type": "array", "items": { "type": "string" } },
+    "applicability_checks": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+    "operations": { "type": "array", "items": { "$ref": "#/$defs/operation" } },
+    "backup_policy": { "type": "object" },
+    "idempotency_rules": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+    "post_apply_checks": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+    "rollback_strategy": { "type": "object" },
+    "compatibility_result_mapping": { "type": "object" },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "required": ["type", "path", "description"],
+      "properties": {
+        "type": { "type": "string" },
+        "path": { "type": "string" },
+        "regex": { "type": "string" },
+        "expected_count": { "type": "integer" },
+        "blocking": { "type": "boolean" },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "operation": {
+      "type": "object",
+      "required": ["type", "target_path", "description"],
+      "properties": {
+        "type": { "type": "string" },
+        "target_path": { "type": "string" },
+        "source_path": { "type": "string" },
+        "match_regex": { "type": "string" },
+        "insert_mode": { "type": "string" },
+        "expected_match_count": { "type": "integer" },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

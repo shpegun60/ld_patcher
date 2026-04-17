@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ld-patcher.local/schemas/verify_recipe.schema.json",
+  "title": "VerifyRecipe",
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "id",
+    "display_name",
+    "description",
+    "status",
+    "checks",
+    "required_inputs",
+    "success_policy"
+  ],
+  "properties": {
+    "schema_type": { "const": "VerifyRecipe" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "enabled": { "type": "boolean" },
+    "id": { "type": "string" },
+    "display_name": { "type": "string" },
+    "description": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["verified_local", "candidate", "draft", "local_only"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "description"],
+        "properties": {
+          "type": { "type": "string" },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "script_ref": { "type": "string" },
+          "path": { "type": "string" },
+          "regex": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "required_inputs": { "type": "array", "items": { "type": "string" } },
+    "success_policy": { "type": "object" },
+    "result_artifacts": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

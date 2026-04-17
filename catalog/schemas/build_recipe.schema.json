@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ld-patcher.local/schemas/build_recipe.schema.json",
+  "title": "BuildRecipe",
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "id",
+    "display_name",
+    "description",
+    "status",
+    "environment",
+    "required_tools",
+    "expected_outputs",
+    "artifact_collection"
+  ],
+  "properties": {
+    "schema_type": { "const": "BuildRecipe" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "enabled": { "type": "boolean" },
+    "id": { "type": "string" },
+    "display_name": { "type": "string" },
+    "description": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["verified_local", "candidate", "draft"]
+    },
+    "environment": {
+      "type": "object",
+      "required": ["os", "shell"],
+      "properties": {
+        "os": { "type": "string" },
+        "shell": { "type": "string" },
+        "host_triplet": { "type": "string" },
+        "target_triplet": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "working_directory_template": { "type": "string" },
+    "script_ref": { "type": "string" },
+    "configure_command": { "type": "array", "items": { "type": "string" } },
+    "build_command": { "type": "array", "items": { "type": "string" } },
+    "clean_command": { "type": "array", "items": { "type": "string" } },
+    "required_tools": { "type": "array", "items": { "type": "string" } },
+    "expected_outputs": { "type": "array", "items": { "type": "string" } },
+    "log_parsing_rules": { "type": "array", "items": { "type": "object" } },
+    "timeouts_seconds": { "type": "object" },
+    "artifact_collection": { "type": "object" },
+    "platform_notes": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

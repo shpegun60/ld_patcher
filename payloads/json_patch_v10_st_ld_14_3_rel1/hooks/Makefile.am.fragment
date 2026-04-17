@@ -1,0 +1,9 @@
+/* Inject into src/binutils/ld/Makefile.am (and regenerate Makefile.in).
+ *
+ * This keeps the standalone json_patch files in source tarballs and makes the
+ * gettext source scan pick up the new help/error strings via SRC_POTFILES.
+ * This tree: append near the existing HFILES / EXTRA_DIST definitions.
+ */
+
+HFILES += ldjson_options.def ldjson_compat.h ldscript_json_impl.inc
+EXTRA_DIST += ldjson_options.def ldjson_compat.h ldscript_json_impl.inc

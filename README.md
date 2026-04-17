@@ -1,0 +1,403 @@
+# ld_patcher
+
+`ld_patcher` is a Qt-based patch/build/verify tool for patched GNU `ld` builds from ST `gnu-tools-for-stm32`.
+
+It is built around a JSON catalog:
+
+- profiles decide routing
+- patch recipes decide compatibility
+- build recipes define how to build
+- verify recipes prove the produced linker works
+
+The current implementation supports the full end-to-end workflow:
+
+- `Analyze`
+- `Validate`
+- `Extract` for ZIP input
+- `Apply`
+- `Build`
+- `Verify`
+- `Package (CubeIDE)`
+
+## Current Support
+
+Locally verified:
+
+- `gnu-tools-for-stm32-13.3.rel1.zip`
+- `gnu-tools-for-stm32-14.3.rel1.zip`
+
+Active profiles:
+
+- `st_gnu_tools_for_stm32_13_3_rel1_20250523_0900`
+- `st_gnu_tools_for_stm32_14_3_rel1`
+
+Active build recipes:
+
+- `msys2_mingw64_st_ld_13_3_verified`
+- `msys2_mingw64_st_ld_14_3_verified`
+
+Active verify recipes:
+
+- `sanity_cli`
+- `json_smoke_self_contained`
+
+## UI Preview
+
+Current `ld_patcher` GUI:
+
+![ld_patcher GUI](img/qt.png)
+
+## What Lives Inside `ld_patcher`
+
+Everything needed for the active patch/build/verify flow is kept inside `ld_patcher`:
+
+- `catalog/`
+  - authoritative catalog index, schemas, profiles, and recipes
+- `payloads/`
+  - patch payload packages used by active patch recipes
+- `scripts/`
+  - helper scripts used by verify/build-related recipes
+- `verify_assets/`
+  - self-contained smoke-test sources and linker script
+- `third_party/libzip`
+  - vendored `libzip` source
+
+The active workflow no longer depends on sibling folders such as:
+
+- `build_04`
+- `json_patch`
+- `ld_sniffer`
+- `ld_viewer`
+- any external STM32 sample project
+
+External tools still needed at runtime:
+
+- the source archive or source tree that you want to patch
+- STM32CubeIDE or an `arm-none-eabi` compiler for the verify step
+- MSYS2/MinGW64 for host-side linker build
+
+`ld_patcher` can bootstrap the MSYS2 build environment automatically when needed.
+
+## Runtime Model
+
+`ld_patcher` reads its own data files from the filesystem, not from a Qt `.qrc` bundle.
+
+It looks for:
+
+- `catalog/catalog.json`
+- `payloads/`
+- `scripts/`
+- `verify_assets/`
+
+starting from:
+
+- the current working directory
+- then the application directory
+- then parent directories
+
+This means the standard development layout works out of the box:
+
+- `ld_patcher/build/.../release/ld_patcher.exe`
+- with the real catalog and payload data still living under the repo-local `ld_patcher/`
+
+Important portability note:
+
+- the built `release/` folder contains Qt runtime DLLs/plugins and `libzip.dll`
+- but it does **not** currently copy `catalog/`, `payloads/`, `scripts/`, and `verify_assets/` into `release/`
+
+So today the safe portable unit is:
+
+- the whole `ld_patcher` folder
+
+not just:
+
+- `ld_patcher/build/.../release`
+
+If you want to move `ld_patcher` to another machine without rebuilding it, copy the full `ld_patcher` directory.
+
+## Workflow
+
+The GUI workflow is step-gated. A step becomes available only after the previous one succeeds.
+
+### Directory Input
+
+For a directory input:
+
+- `Analyze (Input)`
+- `Validate (Input)`
+- `Apply`
+- `Build`
+- `Verify`
+- `Package (CubeIDE)`
+
+`Extract` is skipped.
+
+`Apply` warns before modifying the directory in place.
+
+### ZIP Input
+
+For a ZIP input:
+
+- `Analyze (Input)`
+- `Validate (Input)`
+- `Extract`
+- `Analyze (Working Tree)`
+- `Validate (Working Tree)`
+- `Apply`
+- `Build`
+- `Verify`
+- `Package (CubeIDE)`
+
+For ZIP input, the user chooses:
+
+- the parent extraction folder
+- the extracted working-directory name
+
+This avoids collisions with previous attempts and keeps the mutable workflow on a real directory tree.
+
+## Logs And Status UI
+
+The GUI keeps:
+
+- per-step logs in the right-hand log browser
+- per-step status/progress snapshots in the bottom status panel
+
+When you select a workflow item on the left:
+
+- the log browser shows only logs for that step
+- the bottom status panel restores the saved progress/state for that same step
+
+Current progress behavior:
+
+- `Extract` uses real file-based percent
+- `Analyze`, `Validate`, and `Apply` use internal progress milestones
+- `Build` uses stage-based progress, not true compiler percent
+- `Verify` can use more detailed progress when the verify script emits `LDPATCHER_PROGRESS ...`
+
+`Apply` now also emits detailed live logs for each patch operation, including:
+
+- operation index
+- operation type
+- source/target paths
+- backup creation
+- copy/insert/append results
+- post-apply validation confirmation
+
+## Build / Output Layout
+
+The default build root is:
+
+- `<working_root>/build`
+
+unless the user overrides it in the GUI.
+
+The build preview shows:
+
+- `Build dir`
+- `Install dir`
+- `Verify drop dir`
+- `CubeIDE package dir`
+
+The build step produces:
+
+- a build tree
+- an install tree
+- a drop directory used by verify
+
+The final `Package (CubeIDE)` step creates a ready-to-copy package directory in the style:
+
+- `_cubeide-arm-linker-st-13.3.rel1-jsonpatch`
+- `_cubeide-arm-linker-st-14.3.rel1-jsonpatch`
+
+Package naming is based on the real working-tree name, not only on the profile display name.
+
+The package currently contains:
+
+- `ld.exe`
+- `ld.bfd.exe`
+- `arm-none-eabi-ld.exe`
+- `arm-none-eabi-ld.bfd.exe`
+- `libwinpthread-1.dll`
+- `libzstd.dll`
+
+## Verify Model
+
+The default verify flow is self-contained inside `ld_patcher`.
+
+It no longer depends on any external STM32 example project.
+
+Bundled smoke-test inputs live under:
+
+- `verify_assets/self_contained_smoke/`
+
+The verify step looks for `arm-none-eabi-g++.exe` in this order:
+
+- `STM32_GCC`
+- `PATH`
+- the GUI field `CubeIDE / Compiler Root`
+- standard `C:\ST` installs
+- standard `C:\Program Files\STMicroelectronics` installs
+
+On startup, the GUI also tries to auto-fill the newest STM32CubeIDE install it can find.
+
+## Building `ld_patcher`
+
+Use:
+
+- `ld_patcher/build_ld_patcher.ps1`
+
+Examples:
+
+- release:
+  - `powershell -ExecutionPolicy Bypass -File .\ld_patcher\build_ld_patcher.ps1`
+- debug:
+  - `powershell -ExecutionPolicy Bypass -File .\ld_patcher\build_ld_patcher.ps1 -Configuration Debug`
+- both:
+  - `powershell -ExecutionPolicy Bypass -File .\ld_patcher\build_ld_patcher.ps1 -Configuration Both`
+- force fresh `libzip` rebuild:
+  - `powershell -ExecutionPolicy Bypass -File .\ld_patcher\build_ld_patcher.ps1 -ForceLibzip`
+- clean:
+  - `powershell -ExecutionPolicy Bypass -File .\ld_patcher\build_ld_patcher.ps1 -Configuration Release -Clean`
+
+### What the build script does
+
+The build script:
+
+- resolves the active Qt build directory
+- resolves `qmake`, `mingw32-make`, and `windeployqt`
+- uses existing qmake-generated makefiles when possible
+- rebuilds makefiles only when needed
+- lets the qmake build invoke `ensure_libzip.ps1`
+- deploys Qt runtime with `windeployqt`
+
+`libzip` build artifacts live in:
+
+- `build/<qt-build-dir>/libzip-shared`
+
+Runtime copies live in:
+
+- `build/<qt-build-dir>/release/`
+- `build/<qt-build-dir>/debug/`
+
+### Build-script behavior notes
+
+`Release` is the primary portable runtime output.
+
+`Debug` also builds successfully, but standalone debug deployment may still be limited by the installed Qt kit.
+
+If `windeployqt` fails for `Debug` because debug plugins are missing, the script now:
+
+- keeps the build successful
+- warns that standalone debug deployment is not available
+
+This does not affect the normal `Release` output.
+
+## Direct Qt Creator / qmake builds
+
+If you build directly in Qt Creator or by running `mingw32-make` yourself:
+
+- `ensure_libzip.ps1` is still wired in as a pre-target dependency
+- `libzip.dll` and `zlib1.dll` are prepared automatically
+
+For a full portable `Release` runtime, the bootstrap script is still the recommended path because it also runs `windeployqt`.
+
+## Catalog Layout
+
+- `catalog/catalog.json`
+  - authoritative index
+- `catalog/schemas/`
+  - schemas for profiles, recipes, and result objects
+- `catalog/profiles/`
+  - supported source-tree profiles
+- `catalog/recipes/patch/`
+  - patch recipes and anchor checks
+- `catalog/recipes/build/`
+  - build recipes
+- `catalog/recipes/verify/`
+  - verify recipes
+
+`catalog/catalog.json` is authoritative:
+
+- only indexed JSON files are loaded
+- extra files in the tree are ignored until indexed
+
+Profiles and recipes may be disabled with:
+
+- `"enabled": false`
+
+## Patch Model
+
+There is no single opaque patch script.
+
+Patch logic is split into:
+
+1. JSON patch recipe:
+   - describes required files, anchor checks, operations, and idempotency checks
+2. payload package:
+   - contains the real files and code fragments used by those operations
+
+Active payload packages currently live under:
+
+- `payloads/json_patch_v10_st_ld_13_3_rel1_20250523_0900`
+- `payloads/json_patch_v10_st_ld_14_3_rel1`
+
+The engine is not hard-wired to these names.
+It follows the patch recipe data:
+
+- payload roots
+- required files
+- operation types
+- target/source paths
+
+## CLI
+
+The CLI uses the same backend as the GUI.
+
+- detect:
+  - `ld_patcher.exe --detect <source-dir-or-zip>`
+- validate:
+  - `ld_patcher.exe --validate <source-dir-or-zip>`
+- extract:
+  - `ld_patcher.exe --extract <zip> <parent-dir> <directory-name>`
+- apply:
+  - `ld_patcher.exe --apply <profile-id> <working-root>`
+- build:
+  - `ld_patcher.exe --build <profile-id> <working-root> [build-recipe-id] [build-root-override]`
+- verify:
+  - `ld_patcher.exe --verify <profile-id> <drop-dir> [cubeide-path]`
+- package:
+  - `ld_patcher.exe --package <source-drop-dir> <package-dir>`
+
+## Current Limitations
+
+- `Build` progress is stage-based, not true compiler percent.
+- `Package (CubeIDE)` is still implemented in C++ code, not yet as a fully JSON-driven package recipe.
+- The `release/` runtime folder alone is not yet fully self-contained because app data stays under the main `ld_patcher` tree.
+- If you want a future fully portable dist package, the next logical step is to copy:
+  - `catalog/`
+  - `payloads/`
+  - `scripts/`
+  - `verify_assets/`
+  into the deployed runtime folder or a dedicated `dist/` directory.
+
+## Practical Summary
+
+If you just want to use the tool:
+
+1. build `Release`
+2. run `ld_patcher`
+3. open a supported ST `gnu-tools-for-stm32` ZIP or directory
+4. walk the workflow through:
+   - `Analyze`
+   - `Validate`
+   - `Extract` if needed
+   - `Apply`
+   - `Build`
+   - `Verify`
+   - `Package (CubeIDE)` if you want the final ready-to-copy linker folder
+
+If you want to move it to another machine right now:
+
+- copy the whole `ld_patcher` folder
+
+That is the safest current unit of transfer.

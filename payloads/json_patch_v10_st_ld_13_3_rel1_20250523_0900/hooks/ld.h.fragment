@@ -1,0 +1,8 @@
+/* Inject into args_type in src/binutils/ld/ld.h.
+ * This tree: place directly after the default_script field.
+ */
+
+#define X(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD) \
+  char *ARGS_FIELD;
+#include "ldjson_options.def"
+#undef X

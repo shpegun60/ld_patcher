@@ -1,0 +1,7 @@
+/* Inject new ld_options[] rows in src/binutils/ld/lexsup.c. */
+
+#define X(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD) \
+  { {LONGOPT, HAS_ARG, NULL, OPTION_##ENUM_ID}, '\0', \
+    N_(METAVAR), N_(HELP_TEXT), TWO_DASHES },
+#include "ldjson_options.def"
+#undef X

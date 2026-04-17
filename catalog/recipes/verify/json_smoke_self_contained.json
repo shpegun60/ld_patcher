@@ -1,0 +1,49 @@
+{
+  "$schema": "../../schemas/verify_recipe.schema.json",
+  "schema_type": "VerifyRecipe",
+  "schema_version": 1,
+  "enabled": true,
+  "id": "json_smoke_self_contained",
+  "display_name": "Self-contained JSON smoke",
+  "description": "Builds a tiny bundled C++ smoke project with the CubeIDE arm-none-eabi toolchain, forces the freshly built patched linker through -B, and validates the canonical top-level JSON contract.",
+  "status": "verified_local",
+  "checks": [
+    {
+      "type": "script_exit_zero",
+      "script_ref": "scripts/verify_smoke_self_contained.ps1",
+      "description": "The self-contained verify smoke script runs successfully"
+    },
+    {
+      "type": "file_exists",
+      "path": "{{drop_dir}}/_verify_smoke_self/ldpatcher_self_smoke.json",
+      "description": "Self-contained smoke JSON artifact exists"
+    }
+  ],
+  "required_inputs": [
+    "workspace_root",
+    "drop_dir",
+    "cubeide_path"
+  ],
+  "success_policy": {
+    "all_checks_must_pass": true,
+    "expected_summary_fields": [
+      "Compiler",
+      "CompilerSource",
+      "Format",
+      "MemoryRegions",
+      "OutputSections",
+      "InputSections",
+      "DiscardedInputSections",
+      "Symbols"
+    ]
+  },
+  "result_artifacts": [
+    "{{drop_dir}}/_verify_smoke_self/ldpatcher_self_smoke.json",
+    "{{drop_dir}}/_verify_smoke_self/ldpatcher_self_smoke.elf",
+    "{{drop_dir}}/_verify_smoke_self/ldpatcher_self_smoke.map"
+  ],
+  "notes": [
+    "This verify recipe is self-contained inside ld_patcher and does not depend on external STM32 example projects.",
+    "If arm-none-eabi-g++.exe is not on PATH, it can be auto-detected from STM32CubeIDE or from standard C:\\ST installs."
+  ]
+}

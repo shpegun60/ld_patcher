@@ -1,0 +1,10 @@
+/.qtcreator/
+/build/
+
+# Qt / qmake local state
+*.pro.user
+*.qmake.stash
+
+# Local editors / tooling
+.qtc_clangd/
+

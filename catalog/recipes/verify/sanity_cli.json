@@ -1,0 +1,52 @@
+{
+  "$schema": "../../schemas/verify_recipe.schema.json",
+  "schema_type": "VerifyRecipe",
+  "schema_version": 1,
+  "enabled": true,
+  "id": "sanity_cli",
+  "display_name": "CLI sanity checks",
+  "description": "Minimal command-line checks for a built ld.exe artifact.",
+  "status": "candidate",
+  "checks": [
+    {
+      "type": "file_exists",
+      "path": "{{drop_dir}}/ld.exe",
+      "description": "ld.exe exists"
+    },
+    {
+      "type": "command_exit_zero",
+      "command": [
+        "{{drop_dir}}/ld.exe",
+        "--help"
+      ],
+      "description": "ld.exe --help exits successfully"
+    },
+    {
+      "type": "stdout_regex",
+      "command": [
+        "{{drop_dir}}/ld.exe",
+        "--help"
+      ],
+      "regex": "--dump-script-json",
+      "description": "--help advertises the dump-script-json option"
+    },
+    {
+      "type": "command_exit_zero",
+      "command": [
+        "{{drop_dir}}/ld.exe",
+        "--version"
+      ],
+      "description": "ld.exe --version exits successfully"
+    }
+  ],
+  "required_inputs": [
+    "drop_dir"
+  ],
+  "success_policy": {
+    "all_checks_must_pass": true
+  },
+  "result_artifacts": [],
+  "notes": [
+    "This recipe is generic and should be runnable for any built artifact folder."
+  ]
+}

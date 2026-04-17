@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ld-patcher.local/schemas/detection_result.schema.json",
+  "title": "DetectionResult",
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "matched_profile_id",
+    "confidence",
+    "detected_family",
+    "detected_version_text",
+    "evidence",
+    "warnings",
+    "status"
+  ],
+  "properties": {
+    "schema_type": { "const": "DetectionResult" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "matched_profile_id": { "type": ["string", "null"] },
+    "confidence": {
+      "type": "string",
+      "enum": ["very_high", "high", "medium", "low", "unknown"]
+    },
+    "detected_family": { "type": ["string", "null"] },
+    "detected_version_text": { "type": ["string", "null"] },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "status": {
+      "type": "string",
+      "enum": ["matched", "partial", "unknown"]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "../schemas/version_profile.schema.json",
+  "schema_type": "VersionProfile",
+  "schema_version": 1,
+  "enabled": true,
+  "id": "st_gnu_tools_for_stm32_13_3_rel1_20250523_0900",
+  "display_name": "GNU Tools for STM32 13.3.rel1.20250523-0900",
+  "family": "st-gnu-tools-for-stm32",
+  "selectors": {
+    "tags": [
+      "13.3.rel1.20250523-0900"
+    ],
+    "archive_roots": [
+      "gnu-tools-for-stm32-13.3.rel1"
+    ],
+    "folder_name_patterns": [
+      "gnu-tools-for-stm32-13.3.rel1*"
+    ]
+  },
+  "detection_hints": [
+    {
+      "type": "file_regex",
+      "path": "build-common.sh",
+      "regex": "PKGROOTNAME=\"GNU Tools for STM32\"",
+      "description": "ST product marker in build-common.sh"
+    },
+    {
+      "type": "file_regex",
+      "path": "build-common.sh",
+      "regex": "RELEASEVER=Rel1",
+      "description": "Release level marker"
+    },
+    {
+      "type": "file_regex",
+      "path": "src/gcc/gcc/BASE-VER",
+      "regex": "^13\\.3\\.1$",
+      "description": "Base GCC version for the 13.3 release family"
+    },
+    {
+      "type": "path_exists",
+      "path": "src/binutils/ld/ldlang.c",
+      "description": "Expected ld source layout exists"
+    }
+  ],
+  "patch_recipe_id": "json_patch_v10_st_ld",
+  "build_recipe_ids": [
+    "msys2_mingw64_st_ld_13_3_verified"
+  ],
+  "verify_recipe_ids": [
+    "sanity_cli",
+    "json_smoke_self_contained"
+  ],
+  "priority": 100,
+  "status": "verified_local",
+  "notes": [
+    "This profile matches the locally verified 13.3 source tree in the workspace.",
+    "Compatibility is still finally decided by the patch recipe applicability checks."
+  ]
+}

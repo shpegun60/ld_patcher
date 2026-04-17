@@ -1,0 +1,13 @@
+/* ldjson_options.def
+ * X-macro rows for ld option wiring.
+ *
+ * Row signature:
+ *   X(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD)
+ */
+
+X(DUMP_SCRIPT_JSON,
+  "dump-script-json",
+  required_argument,
+  "FILE",
+  "Write linker script data as indexed JSON",
+  dump_script_json)

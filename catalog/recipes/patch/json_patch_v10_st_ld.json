@@ -1,0 +1,293 @@
+﻿{
+    "$schema":  "../../schemas/patch_recipe.schema.json",
+    "schema_type":  "PatchRecipe",
+    "schema_version":  1,
+    "enabled":  true,
+    "id":  "json_patch_v10_st_ld",
+    "display_name":  "json_patch v10 for ST GNU ld",
+    "description":  "Applies the internal 13.3 json_patch payload package into src/binutils/ld by copying the implementation files and inserting the documented glue fragments.",
+    "status":  "verified_local",
+    "supported_families":  [
+                               "st-gnu-tools-for-stm32"
+                           ],
+    "patch_package":  {
+                          "id":  "json_patch_v10_package",
+                          "root_hint":  "payloads/json_patch_v10_st_ld_13_3_rel1_20250523_0900",
+                          "required_files":  [
+                                                 "ldjson_options.def",
+                                                 "ldjson_compat.h",
+                                                 "ldscript_json_impl.inc",
+                                                 "hooks/ld.h.fragment",
+                                                 "hooks/ldlex.h.fragment",
+                                                 "hooks/lexsup_options.fragment",
+                                                 "hooks/lexsup_switch.fragment",
+                                                 "hooks/ldlang_include.fragment",
+                                                 "hooks/ldlang_runtime.fragment",
+                                                 "hooks/pex-win32.fragment",
+                                                 "hooks/Makefile.am.fragment"
+                                             ]
+                      },
+    "required_files":  [
+                           "src/binutils/ld/ld.h",
+                           "src/binutils/ld/ldlex.h",
+                           "src/binutils/ld/lexsup.c",
+                           "src/binutils/ld/ldlang.c",
+                           "src/binutils/ld/Makefile.am",
+                           "src/binutils/libiberty/pex-win32.c"
+                       ],
+    "optional_files":  [
+                           "src/binutils/ld/Makefile.in"
+                       ],
+    "applicability_checks":  [
+                                 {
+                                     "type":  "file_exists",
+                                     "path":  "src/binutils/ld/ld.h",
+                                     "blocking":  true,
+                                     "description":  "ld.h exists"
+                                 },
+                                 {
+                                     "type":  "file_exists",
+                                     "path":  "src/binutils/ld/ldlex.h",
+                                     "blocking":  true,
+                                     "description":  "ldlex.h exists"
+                                 },
+                                 {
+                                     "type":  "file_exists",
+                                     "path":  "src/binutils/ld/lexsup.c",
+                                     "blocking":  true,
+                                     "description":  "lexsup.c exists"
+                                 },
+                                 {
+                                     "type":  "file_exists",
+                                     "path":  "src/binutils/ld/ldlang.c",
+                                     "blocking":  true,
+                                     "description":  "ldlang.c exists"
+                                 },
+                                 {
+                                     "type":  "file_exists",
+                                     "path":  "src/binutils/ld/Makefile.am",
+                                     "blocking":  true,
+                                     "description":  "Makefile.am exists"
+                                 },
+                                 {
+                                     "type":  "file_exists",
+                                     "path":  "src/binutils/libiberty/pex-win32.c",
+                                     "blocking":  true,
+                                     "description":  "pex-win32.c exists"
+                                 },
+                                 {
+                                     "type":  "regex_present",
+                                     "path":  "src/binutils/ld/ld.h",
+                                     "regex":  "char \\*default_script;",
+                                     "expected_count":  1,
+                                     "blocking":  true,
+                                     "description":  "args_type contains the default_script anchor"
+                                 },
+                                 {
+                                     "type":  "regex_present",
+                                     "path":  "src/binutils/ld/ldlex.h",
+                                     "regex":  "OPTION_DEFAULT_SCRIPT,",
+                                     "expected_count":  1,
+                                     "blocking":  true,
+                                     "description":  "option_values contains the default script anchor"
+                                 },
+                                 {
+                                     "type":  "regex_present",
+                                     "path":  "src/binutils/ld/lexsup.c",
+                                     "regex":  "\\{\"dT\", required_argument, NULL, OPTION_DEFAULT_SCRIPT\\},\\s*'\\\\0', NULL, NULL, ONE_DASH \\},",
+                                     "expected_count":  1,
+                                     "blocking":  true,
+                                     "description":  "ld_options[] contains the default-script row anchor"
+                                 },
+                                 {
+                                     "type":  "regex_present",
+                                     "path":  "src/binutils/ld/lexsup.c",
+                                     "regex":  "case OPTION_DEFAULT_SCRIPT:",
+                                     "expected_count":  1,
+                                     "blocking":  true,
+                                     "description":  "parse_args() contains the OPTION_DEFAULT_SCRIPT case anchor"
+                                 },
+                                 {
+                                     "type":  "regex_present",
+                                     "path":  "src/binutils/ld/ldlang.c",
+                                     "regex":  "print_statement_list \\(statement_list\\.head, abs_output_section\\);",
+                                     "expected_count":  1,
+                                     "blocking":  true,
+                                     "description":  "ldlang.c contains the print_statements() include anchor"
+                                 },
+                                 {
+                                     "type":  "regex_present",
+                                     "path":  "src/binutils/ld/ldlang.c",
+                                     "regex":  "ldlang_check_require_defined_symbols \\(\\);\\s*lang_end \\(\\);",
+                                     "expected_count":  1,
+                                     "blocking":  true,
+                                     "description":  "ldlang.c contains the finalized lang_process() runtime-call anchor"
+                                 }
+                             ],
+    "operations":  [
+                       {
+                           "type":  "copy_file",
+                           "target_path":  "src/binutils/ld/ldjson_options.def",
+                           "source_path":  "ldjson_options.def",
+                           "description":  "Copy the X-macro option definition file"
+                       },
+                       {
+                           "type":  "copy_file",
+                           "target_path":  "src/binutils/ld/ldjson_compat.h",
+                           "source_path":  "ldjson_compat.h",
+                           "description":  "Copy the portability and format metadata header"
+                       },
+                       {
+                           "type":  "copy_file",
+                           "target_path":  "src/binutils/ld/ldscript_json_impl.inc",
+                           "source_path":  "ldscript_json_impl.inc",
+                           "description":  "Copy the standalone linker JSON implementation block"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/ld/ld.h",
+                           "source_path":  "hooks/ld.h.fragment",
+                           "match_regex":  "char \\*default_script;",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Expand args_type fields from ldjson_options.def"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/ld/ldlex.h",
+                           "source_path":  "hooks/ldlex.h.fragment",
+                           "match_regex":  "OPTION_DEFAULT_SCRIPT,",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Expand option_values enum rows from ldjson_options.def"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/ld/lexsup.c",
+                           "source_path":  "hooks/lexsup_options.fragment",
+                           "match_regex":  "\\{\"dT\", required_argument, NULL, OPTION_DEFAULT_SCRIPT\\},\\s*'\\\\0', NULL, NULL, ONE_DASH \\},",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Insert new ld_options[] rows after the default-script option block"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/ld/lexsup.c",
+                           "source_path":  "hooks/lexsup_switch.fragment",
+                           "match_regex":  "case OPTION_DEFAULT_SCRIPT:[\\s\\S]*?break;",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Insert parse_args() switch handling for the JSON options"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/ld/ldlang.c",
+                           "source_path":  "hooks/ldlang_include.fragment",
+                           "match_regex":  "print_statement_list \\(statement_list\\.head, abs_output_section\\);\\s*\\}",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Include ldscript_json_impl.inc in file scope"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/ld/ldlang.c",
+                           "source_path":  "hooks/ldlang_runtime.fragment",
+                           "match_regex":  "ldlang_check_require_defined_symbols \\(\\);\\s*lang_end \\(\\);",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Call lang_dump_script_json() after lang_end()"
+                       },
+                       {
+                           "type":  "insert_after_regex",
+                           "target_path":  "src/binutils/libiberty/pex-win32.c",
+                           "source_path":  "hooks/pex-win32.fragment",
+                           "match_regex":  "#include <stmicroelectronics/longpath\\.h>",
+                           "insert_mode":  "after",
+                           "expected_match_count":  1,
+                           "description":  "Add a local longpath fallback for ZIP snapshots that lack ST runtime wrappers"
+                       },
+                       {
+                           "type":  "append_if_missing",
+                           "target_path":  "src/binutils/ld/Makefile.am",
+                           "source_path":  "hooks/Makefile.am.fragment",
+                           "description":  "Extend HFILES and EXTRA_DIST so the patch files ship in source tarballs"
+                       }
+                   ],
+    "backup_policy":  {
+                          "mode":  "copy_before_modify",
+                          "suffix":  ".ldpatcher.bak"
+                      },
+    "idempotency_rules":  [
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/ld/ldlang.c",
+                                  "regex":  "#include \"ldscript_json_impl\\.inc\"",
+                                  "expected_count":  1,
+                                  "blocking":  false,
+                                  "description":  "Implementation include should appear exactly once after apply"
+                              },
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/ld/ldlang.c",
+                                  "regex":  "lang_dump_script_json \\(\\);",
+                                  "expected_count":  1,
+                                  "blocking":  false,
+                                  "description":  "Runtime hook should appear exactly once after apply"
+                              },
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/libiberty/pex-win32.c",
+                                  "regex":  "#define handle_long_path_utf8 stm32_local_handle_long_path_utf8",
+                                  "expected_count":  1,
+                                  "blocking":  false,
+                                  "description":  "pex-win32 longpath fallback should appear exactly once after apply"
+                              }
+                          ],
+    "post_apply_checks":  [
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/ld/ldjson_compat.h",
+                                  "regex":  "#define LDJSON_FORMAT_MAJOR 10",
+                                  "expected_count":  1,
+                                  "blocking":  true,
+                                  "description":  "Format major is v10"
+                              },
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/ld/ldjson_options.def",
+                                  "regex":  "X\\(DUMP_SCRIPT_JSON,\\s*\"dump-script-json\"",
+                                  "expected_count":  1,
+                                  "blocking":  true,
+                                  "description":  "The dump-script-json CLI option row is present"
+                              },
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/ld/Makefile.am",
+                                  "regex":  "HFILES \\+= ldjson_options\\.def ldjson_compat\\.h ldscript_json_impl\\.inc",
+                                  "expected_count":  1,
+                                  "blocking":  true,
+                                  "description":  "Makefile.am exports the patch files through HFILES"
+                              },
+                              {
+                                  "type":  "regex_present",
+                                  "path":  "src/binutils/ld/Makefile.am",
+                                  "regex":  "EXTRA_DIST \\+= ldjson_options\\.def ldjson_compat\\.h ldscript_json_impl\\.inc",
+                                  "expected_count":  1,
+                                  "blocking":  true,
+                                  "description":  "Makefile.am exports the patch files through EXTRA_DIST"
+                              }
+                          ],
+    "rollback_strategy":  {
+                              "mode":  "restore_backups"
+                          },
+    "compatibility_result_mapping":  {
+                                         "all_blocking_checks_pass":  "candidate",
+                                         "verified_local_profiles":  [
+                                                                         "st_gnu_tools_for_stm32_13_3_rel1_20250523_0900"
+                                                                     ]
+                                     },
+    "notes":  [
+                  "This recipe is built around the standalone json_patch package already maintained in this workspace.",
+                  "This recipe uses the internal 13.3 payload package maintained under ld_patcher/payloads."
+              ]
+}

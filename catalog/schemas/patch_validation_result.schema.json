@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ld-patcher.local/schemas/patch_validation_result.schema.json",
+  "title": "PatchValidationResult",
+  "type": "object",
+  "required": [
+    "schema_type",
+    "schema_version",
+    "patch_recipe_id",
+    "applicable",
+    "already_patched",
+    "support_level",
+    "passed_checks",
+    "failed_checks",
+    "warnings"
+  ],
+  "properties": {
+    "schema_type": { "const": "PatchValidationResult" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "patch_recipe_id": { "type": "string" },
+    "applicable": { "type": "boolean" },
+    "already_patched": { "type": "boolean" },
+    "support_level": {
+      "type": "string",
+      "enum": ["verified_local", "candidate", "unsupported"]
+    },
+    "passed_checks": { "type": "array", "items": { "type": "string" } },
+    "failed_checks": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "blocking_reason": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

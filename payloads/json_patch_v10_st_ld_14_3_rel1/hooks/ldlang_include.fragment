@@ -1,0 +1,3 @@
+/* Inject the JSON implementation block in file scope in src/binutils/ld/ldlang.c. */
+
+#include "ldscript_json_impl.inc"

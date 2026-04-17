@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>980</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ld_patcher</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="titleLabel">
+      <property name="text">
+       <string>ld_patcher: detect ST GNU toolchain trees from folder or ZIP and route them to JSON recipes.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="pathLayout">
+      <item>
+       <widget class="QLineEdit" name="pathEdit">
+        <property name="placeholderText">
+         <string>Select a source directory or a .zip archive</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="browseFolderButton">
+        <property name="text">
+         <string>Browse Folder</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="browseZipButton">
+        <property name="text">
+         <string>Browse ZIP</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="analyzeButton">
+        <property name="text">
+         <string>Analyze + Validate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="validateButton">
+        <property name="text">
+         <string>Validate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cancelButton">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="cubeIdeRootLayout">
+      <item>
+       <widget class="QLabel" name="cubeIdeRootLabel">
+        <property name="text">
+         <string>CubeIDE / Compiler Root</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="cubeIdeRootEdit">
+        <property name="placeholderText">
+         <string>Optional. Point to STM32CubeIDE or another folder containing arm-none-eabi-g++.exe.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="browseCubeIdeRootButton">
+        <property name="text">
+         <string>Browse CubeIDE Root</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="buildRootLayout">
+      <item>
+       <widget class="QLabel" name="buildRootLabel">
+        <property name="text">
+         <string>Build / Output Root</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="buildRootEdit">
+        <property name="placeholderText">
+         <string>Optional. Leave empty to use the recipe default output location.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="browseBuildRootButton">
+        <property name="text">
+         <string>Browse Build Root</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="buildLayoutPreviewLabel">
+      <property name="text">
+       <string>Build layout preview will appear here after profile selection.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::TextSelectableByMouse</set>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: #6a6a6a;</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="packageDirLayout">
+      <item>
+       <widget class="QLabel" name="packageDirLabel">
+        <property name="text">
+         <string>CubeIDE linker package</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="packageDirEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Will appear after Build layout is known or after Package finishes.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="openDropDirButton">
+        <property name="text">
+         <string>Open Drop Dir</string>
+        </property>
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="statusLabel">
+      <property name="text">
+       <string>Catalog not loaded yet</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="logEdit">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QPlainTextEdit::NoWrap</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>980</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

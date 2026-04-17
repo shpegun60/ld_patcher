@@ -1,0 +1,90 @@
+﻿{
+  "$schema": "../../schemas/build_recipe.schema.json",
+  "schema_type": "BuildRecipe",
+  "schema_version": 1,
+  "enabled": true,
+  "id": "msys2_mingw64_st_ld_13_3_verified",
+  "display_name": "MSYS2 MinGW64 internal ST ld build for 13.3",
+  "description": "Self-contained internal build recipe for the patched STM32 13.3 linker. It builds inside the user-selected build root and does not depend on any external helper-script folders.",
+  "status": "verified_local",
+  "environment": {
+    "os": "windows",
+    "shell": "msys2_mingw64",
+    "host_triplet": "x86_64-w64-mingw32",
+    "target_triplet": "arm-none-eabi"
+  },
+  "working_directory_template": "{{build_dir}}",
+  "clean_command": [
+    "rm",
+    "-rf",
+    "{{build_dir}}",
+    "{{install_dir}}",
+    "{{drop_dir}}",
+    "{{package_dir}}"
+  ],
+  "configure_command": [
+    "{{source_root}}/src/binutils/configure",
+    "{{configure_cflags_arg}}",
+    "{{configure_cppflags_arg}}",
+    "--prefix={{install_dir}}",
+    "--build=x86_64-w64-mingw32",
+    "--host=x86_64-w64-mingw32",
+    "--target=arm-none-eabi",
+    "--disable-gdb",
+    "--disable-sim",
+    "--disable-nls",
+    "--enable-plugins",
+    "--with-sysroot={{install_dir}}/arm-none-eabi",
+    "--with-pkgversion=GNU Tools for STM32 {{display_version}}",
+    "--disable-werror"
+  ],
+  "build_command": [
+    "make",
+    "-j{{jobs}}",
+    "MAKEINFO=true",
+    "all-ld",
+    "&&",
+    "make",
+    "MAKEINFO=true",
+    "install-ld"
+  ],
+  "required_tools": [
+    "MSYS2 shell",
+    "mingw64 gcc",
+    "mingw64 make",
+    "mingw64 binutils",
+    "mingw64 zstd runtime"
+  ],
+  "expected_outputs": [
+    "{{drop_dir}}/ld.exe",
+    "{{drop_dir}}/ld.bfd.exe",
+    "{{drop_dir}}/arm-none-eabi-ld.exe",
+    "{{drop_dir}}/arm-none-eabi-ld.bfd.exe"
+  ],
+  "log_parsing_rules": [
+    {
+      "type": "warning_only",
+      "regex": "pod2man: command not found",
+      "description": "Known non-blocking upstream warning on some local setups"
+    },
+    {
+      "type": "warning_only",
+      "regex": "install-info: No such file or directory",
+      "description": "Known non-blocking upstream warning"
+    }
+  ],
+  "timeouts_seconds": {
+    "build": 7200
+  },
+  "artifact_collection": {
+    "drop_dir": "{{drop_dir}}"
+  },
+  "platform_notes": [
+    "This recipe is self-contained inside ld_patcher and builds into the selected build root.",
+    "ld_patcher will bootstrap MSYS2 and the required mingw64 packages if they are missing."
+  ],
+  "notes": [
+    "This recipe is the active self-contained 13.3 build path inside ld_patcher.",
+    "It remains compatible with the same CubeIDE drop layout expected by the packaging step."
+  ]
+}

@@ -1,0 +1,13 @@
+/* Inject into src/binutils/ld/ldlang.c only (not src/gdb/ld/ldlang.c). */
+
+/* Near declarations (optional depending on placement): */
+/* static void init_opb (asection *); */
+/* static void lang_dump_script_json (void); */
+
+/* Fragment A: include implementation block in file scope.
+ * This tree: place after print_statements(), before insert_pad(...).
+ */
+#include "ldscript_json_impl.inc"
+
+/* Fragment B: inside lang_process(), after lang_end(); */
+lang_dump_script_json ();

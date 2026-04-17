@@ -1,0 +1,40 @@
+/* Inject a local longpath fallback in src/binutils/libiberty/pex-win32.c. */
+
+/* Local fallback for environments where ST longpath runtime wrappers are not
+   generated. */
+#ifndef STM32_LONGPATH_RUNTIME
+static wchar_t *
+stm32_local_utf8_to_wchar (const char *src)
+{
+  int needed;
+  wchar_t *dst;
+
+  if (src == NULL)
+    return NULL;
+
+  needed = MultiByteToWideChar (CP_UTF8, 0, src, -1, NULL, 0);
+  if (needed <= 0)
+    return NULL;
+
+  dst = (wchar_t *) malloc ((size_t) needed * sizeof (wchar_t));
+  if (dst == NULL)
+    return NULL;
+
+  if (MultiByteToWideChar (CP_UTF8, 0, src, -1, dst, needed) <= 0)
+    {
+      free (dst);
+      return NULL;
+    }
+
+  return dst;
+}
+
+static wchar_t *
+stm32_local_handle_long_path_utf8 (const char *src)
+{
+  return stm32_local_utf8_to_wchar (src);
+}
+
+#define utf8_to_wchar stm32_local_utf8_to_wchar
+#define handle_long_path_utf8 stm32_local_handle_long_path_utf8
+#endif
