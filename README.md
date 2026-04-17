@@ -1,6 +1,6 @@
 # ld_patcher
 
-`ld_patcher` is a Qt-based patch/build/verify tool for patched GNU `ld` builds from ST `gnu-tools-for-stm32`.
+`ld_patcher` is a Qt-based patch/build/verify tool for producing patched GNU `ld` builds from ST `gnu-tools-for-stm32` sources.
 
 It is built around a JSON catalog:
 
@@ -18,6 +18,54 @@ The current implementation supports the full end-to-end workflow:
 - `Build`
 - `Verify`
 - `Package (CubeIDE)`
+
+## What The Patch Does
+
+`ld_patcher` does not simply rebuild ST's linker unchanged.
+It patches ST's `src/binutils/ld` sources so the resulting GNU `ld` can emit a structured JSON dump of the resolved link state.
+
+At a high level, the patch:
+
+- adds the internal JSON implementation files into `src/binutils/ld`
+- extends the linker option tables so the patched linker accepts the JSON dump option set
+- injects runtime glue into `ldlang.c` so JSON export runs after the final linker layout is known
+- extends `Makefile.am` so the added patch files are part of the source/build flow
+- keeps the final binaries usable as a drop-in linker package for STM32CubeIDE
+
+The emitted JSON exposes linker state in a machine-readable form instead of forcing downstream tools to scrape `.map` files or linker diagnostics.
+
+The current self-contained verify flow checks the canonical top-level JSON payload:
+
+- `format`
+- `output`
+- `memory_regions`
+- `output_sections`
+- `input_sections`
+- `discarded_input_sections`
+- `symbols`
+
+In practice, this gives you structured access to:
+
+- the resolved entry symbol
+- linker memory regions
+- final output sections
+- input sections and their placement
+- discarded input sections
+- linker-visible symbols
+
+## Why This Exists
+
+The patch exists to make ST's `gnu-tools-for-stm32` linker observable and automation-friendly.
+
+This is useful when you want to:
+
+- inspect the final linker layout programmatically
+- validate linker-script behavior without reverse-parsing `.map` files
+- compare toolchain revisions or linker-script changes
+- feed linker results into custom tooling, visualizers, regression checks, or diagnostics
+- generate a ready-to-copy patched linker package for STM32CubeIDE instead of maintaining ad-hoc binaries by hand
+
+`ld_patcher` is aimed at ST's `gnu-tools-for-stm32` source packages, not at arbitrary upstream GNU Arm toolchain trees.
 
 ## Current Support
 
@@ -41,6 +89,32 @@ Active verify recipes:
 - `sanity_cli`
 - `json_smoke_self_contained`
 
+## Supported ST Source Packages
+
+Official upstream for the supported source snapshots:
+
+- STMicroelectronics `gnu-tools-for-stm32`:
+  - https://github.com/STMicroelectronics/gnu-tools-for-stm32
+
+Currently supported and locally verified source packages:
+
+- `gnu-tools-for-stm32-13.3.rel1.zip`
+  - source tree:
+    - https://github.com/STMicroelectronics/gnu-tools-for-stm32/tree/13.3.rel1
+  - source ZIP:
+    - https://github.com/STMicroelectronics/gnu-tools-for-stm32/archive/refs/tags/13.3.rel1.zip
+- `gnu-tools-for-stm32-14.3.rel1.zip`
+  - source tree:
+    - https://github.com/STMicroelectronics/gnu-tools-for-stm32/tree/14.3.rel1
+  - source ZIP:
+    - https://github.com/STMicroelectronics/gnu-tools-for-stm32/archive/refs/tags/14.3.rel1.zip
+
+Notes:
+
+- the supported input snapshots are the official ST source archives/tags above
+- after detection or build, ST's fuller display version may include an additional release stamp such as `13.3.rel1.20250523-0900`
+- package naming inside `ld_patcher` is based on the real working-tree name, not only on the profile display string
+
 ## UI Preview
 
 Current `ld_patcher` GUI:
@@ -56,7 +130,7 @@ Everything needed for the active patch/build/verify flow is kept inside `ld_patc
 - `payloads/`
   - patch payload packages used by active patch recipes
 - `scripts/`
-  - helper scripts used by verify/build-related recipes
+  - helper scripts used by verify and build-related recipes
 - `verify_assets/`
   - self-contained smoke-test sources and linker script
 - `third_party/libzip`
@@ -174,7 +248,7 @@ Current progress behavior:
 - `Build` uses stage-based progress, not true compiler percent
 - `Verify` can use more detailed progress when the verify script emits `LDPATCHER_PROGRESS ...`
 
-`Apply` now also emits detailed live logs for each patch operation, including:
+`Apply` also emits detailed live logs for each patch operation, including:
 
 - operation index
 - operation type
@@ -299,7 +373,7 @@ If you build directly in Qt Creator or by running `mingw32-make` yourself:
 - `ensure_libzip.ps1` is still wired in as a pre-target dependency
 - `libzip.dll` and `zlib1.dll` are prepared automatically
 
-For a full portable `Release` runtime, the bootstrap script is still the recommended path because it also runs `windeployqt`.
+For a fully portable `Release` runtime, the bootstrap script is still the recommended path because it also runs `windeployqt`.
 
 ## Catalog Layout
 
@@ -387,7 +461,7 @@ If you just want to use the tool:
 1. build `Release`
 2. run `ld_patcher`
 3. open a supported ST `gnu-tools-for-stm32` ZIP or directory
-4. walk the workflow through:
+4. walk through the workflow:
    - `Analyze`
    - `Validate`
    - `Extract` if needed
@@ -400,4 +474,4 @@ If you want to move it to another machine right now:
 
 - copy the whole `ld_patcher` folder
 
-That is the safest current unit of transfer.
+That is the safest transfer unit today.
