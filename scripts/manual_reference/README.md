@@ -2,6 +2,10 @@
 
 These scripts preserve the useful non-GUI/manual workflows inside `ld_patcher`.
 
+Before using them, install the required environment from:
+
+- [`../../docs/PREREQUISITES.md`](../../docs/PREREQUISITES.md)
+
 Current primary script:
 
 - `build_st_ld_manual.sh`
@@ -24,6 +28,14 @@ Guidance:
 - use `copy_patch_payload.ps1` to copy the real implementation files from the
   same payload packages used by the app
 - use `check_manual_patch.ps1` after you paste the hook fragments
+  - it checks:
+    - copied implementation files
+    - `ld.h`
+    - `ldlex.h`
+    - `lexsup.c`
+    - `ldlang.c`
+    - `pex-win32.c`
+    - `Makefile.am`
 - use `build_st_ld_manual.sh` as the main hand-build path
 - use the two longpath variants only when you specifically need to test that
   area

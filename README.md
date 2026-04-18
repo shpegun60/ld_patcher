@@ -19,6 +19,85 @@ The current implementation supports the full end-to-end workflow:
 - `Verify`
 - `Package (CubeIDE)`
 
+## Contents
+
+- [Documentation Map](docs/DOCUMENTATION_MAP.md)
+- [Prerequisites](docs/PREREQUISITES.md)
+- [Manual Workflow](docs/MANUAL_WORKFLOW.md)
+- [CLI Reference](docs/CLI_REFERENCE.md)
+- [CubeIDE Integration](docs/CUBEIDE_INTEGRATION.md)
+- [Manual Patch Package](docs/MANUAL_PATCH_PACKAGE.md)
+- [Adding Support For A New Compiler Version](docs/ADDING_SUPPORT.md)
+- [Linker JSON Contract](docs/LINKER_JSON_CONTRACT.md)
+- [Workspace Cleanup](docs/WORKSPACE_CLEANUP.md)
+
+## Start Here
+
+If you only need one answer to "what should I open first?", use this:
+
+1. if you want to use the program with the least thinking:
+   - open [Documentation Map](docs/DOCUMENTATION_MAP.md)
+   - then open [Prerequisites](docs/PREREQUISITES.md)
+   - then open [Manual Workflow](docs/MANUAL_WORKFLOW.md) or just use the GUI
+2. if you want to work from the command line:
+   - open [Prerequisites](docs/PREREQUISITES.md)
+   - open [CLI Reference](docs/CLI_REFERENCE.md)
+3. if you want to do the whole patch by hand without the GUI:
+   - open [Prerequisites](docs/PREREQUISITES.md)
+   - open [Manual Patch Package](docs/MANUAL_PATCH_PACKAGE.md)
+   - then open [Manual Workflow](docs/MANUAL_WORKFLOW.md)
+4. if you want to plug the finished linker into STM32CubeIDE:
+   - open [Prerequisites](docs/PREREQUISITES.md)
+   - open [CubeIDE Integration](docs/CUBEIDE_INTEGRATION.md)
+5. if you want to add support for a new ST release:
+   - open [Prerequisites](docs/PREREQUISITES.md)
+   - open [Adding Support For A New Compiler Version](docs/ADDING_SUPPORT.md)
+
+## If You Have Never Used A Terminal
+
+You can still use this repository. The docs use a few repeated terms:
+
+- `PowerShell`
+  - the normal Windows command console used in this repository for `.ps1` commands
+- `MSYS2 MINGW64 shell`
+  - the Unix-like shell used to build the patched linker itself
+- `working tree`
+  - the extracted ST source directory that you are patching
+- `drop dir`
+  - the build output directory containing the finished linker binaries
+- `package dir`
+  - the final CubeIDE-ready folder that you point CubeIDE at through `-B".../"`
+
+If a document shows placeholders like:
+
+- `<profile-id>`
+- `<working-root>`
+- `<drop-dir>`
+
+that means you must replace them with real values from your own machine.
+
+The beginner-safe order is:
+
+1. keep the whole `ld_patcher` folder together
+2. use the GUI first if you can
+3. if you need command-line work, copy commands from [CLI Reference](docs/CLI_REFERENCE.md)
+4. if you need to patch everything manually, copy commands from [Manual Workflow](docs/MANUAL_WORKFLOW.md)
+
+## What You Need Before Anything Else
+
+For normal patch/build/verify work you need:
+
+- one supported ST source ZIP or extracted source tree
+- STM32CubeIDE or another `arm-none-eabi` compiler for the verify step
+- MSYS2/MinGW64 for the host-side linker build
+
+For just reading the docs or preparing patch payloads by hand, you do not need
+to build `ld_patcher.exe` first.
+
+Full dependency and installation guidance lives in:
+
+- [Prerequisites](docs/PREREQUISITES.md)
+
 ## What The Patch Does
 
 `ld_patcher` does not simply rebuild ST's linker unchanged.
@@ -125,29 +204,49 @@ Current `ld_patcher` GUI:
 
 One current documentation set lives in:
 
-- `docs/DOCUMENTATION_MAP.md`
+- [Documentation Map](docs/DOCUMENTATION_MAP.md)
 
 Primary documents:
 
-- `docs/MANUAL_WORKFLOW.md`
-- `docs/CLI_REFERENCE.md`
-- `docs/CUBEIDE_INTEGRATION.md`
-- `docs/MANUAL_PATCH_PACKAGE.md`
-- `docs/ADDING_SUPPORT.md`
-- `docs/LINKER_JSON_CONTRACT.md`
-- `docs/WORKSPACE_CLEANUP.md`
+- [Prerequisites](docs/PREREQUISITES.md)
+- [Manual Workflow](docs/MANUAL_WORKFLOW.md)
+- [CLI Reference](docs/CLI_REFERENCE.md)
+- [CubeIDE Integration](docs/CUBEIDE_INTEGRATION.md)
+- [Manual Patch Package](docs/MANUAL_PATCH_PACKAGE.md)
+- [Adding Support For A New Compiler Version](docs/ADDING_SUPPORT.md)
+- [Linker JSON Contract](docs/LINKER_JSON_CONTRACT.md)
+- [Workspace Cleanup](docs/WORKSPACE_CLEANUP.md)
+
+If you want the shortest explanation of what each document is for:
+
+- [Documentation Map](docs/DOCUMENTATION_MAP.md)
+  - which document to read first
+- [Prerequisites](docs/PREREQUISITES.md)
+  - what to install before GUI, CLI, manual build, verify, or source build
+- [Manual Workflow](docs/MANUAL_WORKFLOW.md)
+  - exact no-GUI/manual commands, with inline scripts and expected results
+- [CLI Reference](docs/CLI_REFERENCE.md)
+  - exact `ld_patcher.exe` commands and what each argument means
+- [CubeIDE Integration](docs/CUBEIDE_INTEGRATION.md)
+  - exact `-B".../"` hookup inside STM32CubeIDE
+- [Manual Patch Package](docs/MANUAL_PATCH_PACKAGE.md)
+  - exact payload files, insertion points, and expected source code after insertion
+- [Adding Support For A New Compiler Version](docs/ADDING_SUPPORT.md)
+  - maintainer cookbook for adding a new ST version
+- [Linker JSON Contract](docs/LINKER_JSON_CONTRACT.md)
+  - the canonical output shape expected from `--dump-script-json`
 
 Manual helper scripts live in:
 
-- `scripts/manual_reference/`
+- [scripts/manual_reference/](scripts/manual_reference/)
 
 These manual helpers are wired to the same current payload packages and
 self-contained verify assets used by the application workflow, and the same
-current script contents are embedded inline in `docs/MANUAL_WORKFLOW.md`.
+current script contents are embedded inline in [Manual Workflow](docs/MANUAL_WORKFLOW.md).
 
 Reference sample outputs live in:
 
-- `docs/reference_samples/`
+- [docs/reference_samples/](docs/reference_samples/)
 
 ## What Lives Inside `ld_patcher`
 
@@ -173,7 +272,7 @@ The active workflow no longer depends on sibling folders such as:
 - any external STM32 sample project
 
 The workspace-specific documentation and manual knowledge now live directly
-inside this repository in the canonical docs and `scripts/manual_reference/`
+inside this repository in the canonical docs and [`scripts/manual_reference/`](scripts/manual_reference/)
 layout, so they no longer need to remain scattered across old helper folders.
 
 External tools still needed at runtime:
@@ -479,11 +578,11 @@ The CLI uses the same backend as the GUI.
 
 Full CLI reference:
 
-- `docs/CLI_REFERENCE.md`
+- [CLI Reference](docs/CLI_REFERENCE.md)
 
 If you want to add support for a new ST version:
 
-- `docs/ADDING_SUPPORT.md`
+- [Adding Support For A New Compiler Version](docs/ADDING_SUPPORT.md)
 
 ## Current Limitations
 

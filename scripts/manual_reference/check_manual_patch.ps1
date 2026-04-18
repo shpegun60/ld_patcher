@@ -109,6 +109,7 @@ $ldlexH = Join-Path $srcLd 'ldlex.h'
 $lexsupC = Join-Path $srcLd 'lexsup.c'
 $ldlangC = Join-Path $srcLd 'ldlang.c'
 $makefileAm = Join-Path $srcLd 'Makefile.am'
+$pexWin32 = Join-Path $SourceRoot 'src\binutils\libiberty\pex-win32.c'
 
 Assert-Regex $ldH 'char \*default_script;\r?\n\r?\n#define X\(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD\)' 'ld.h X-macro glue block'
 Assert-Regex $ldlexH 'OPTION_DEFAULT_SCRIPT,\r?\n#define X\(ENUM_ID, LONGOPT, HAS_ARG, METAVAR, HELP_TEXT, ARGS_FIELD\)' 'ldlex.h X-macro glue block'
@@ -116,6 +117,7 @@ Assert-Regex $lexsupC '#include "ldjson_options\.def"' 'lexsup.c includes ldjson
 Assert-Regex $lexsupC 'command_line\.ARGS_FIELD = optarg;' 'lexsup.c parse_args glue block'
 Assert-Regex $ldlangC '#include "ldscript_json_impl\.inc"' 'ldlang.c includes implementation'
 Assert-Regex $ldlangC 'lang_dump_script_json \(\);' 'ldlang.c runtime hook'
+Assert-Regex $pexWin32 '#define handle_long_path_utf8 stm32_local_handle_long_path_utf8' 'pex-win32 longpath fallback glue'
 Assert-Regex $makefileAm 'HFILES \+= ldjson_options\.def ldjson_compat\.h ldscript_json_impl\.inc' 'Makefile.am HFILES glue'
 Assert-Regex $makefileAm 'EXTRA_DIST \+= ldjson_options\.def ldjson_compat\.h ldscript_json_impl\.inc' 'Makefile.am EXTRA_DIST glue'
 

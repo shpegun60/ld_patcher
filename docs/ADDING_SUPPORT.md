@@ -6,12 +6,38 @@ ST `gnu-tools-for-stm32` source package.
 The goal is to add support without inventing a second patch system. New support
 must plug into the same current model:
 
-- `payloads/` contain the patch material
-- `catalog/profiles/` route detection
-- `catalog/recipes/patch/` decide compatibility and apply operations
-- `catalog/recipes/build/` describe how to build
-- `catalog/recipes/verify/` prove that the result works
-- `catalog/catalog.json` decides what is active
+- [`../payloads/`](../payloads/) contain the patch material
+- [`../catalog/profiles/`](../catalog/profiles/) route detection
+- [`../catalog/recipes/patch/`](../catalog/recipes/patch/) decide compatibility and apply operations
+- [`../catalog/recipes/build/`](../catalog/recipes/build/) describe how to build
+- [`../catalog/recipes/verify/`](../catalog/recipes/verify/) prove that the result works
+- [`../catalog/catalog.json`](../catalog/catalog.json) decides what is active
+
+## Who Should Read This
+
+This document is for maintainers of `ld_patcher`, not for ordinary users who
+just want to patch one supported ST release.
+
+Read this only if you want to make `ld_patcher` understand a new ST source
+version.
+
+Before you try to validate or build a new ST version, make sure the environment
+from [Prerequisites](PREREQUISITES.md) is already installed and working.
+
+## What You Actually Create For One New Version
+
+In practice, adding support for one new ST release usually means creating or
+updating these things:
+
+1. one payload package under [`../payloads/`](../payloads/)
+2. one patch recipe under [`../catalog/recipes/patch/`](../catalog/recipes/patch/)
+3. sometimes one build recipe under [`../catalog/recipes/build/`](../catalog/recipes/build/)
+4. usually no new verify recipe unless verification rules changed
+5. one profile under [`../catalog/profiles/`](../catalog/profiles/)
+6. one catalog index update in [`../catalog/catalog.json`](../catalog/catalog.json)
+
+If you skip one of these, the new version will usually look half-added and will
+confuse the next maintainer.
 
 ## When You Need A New Support Entry
 
@@ -35,10 +61,10 @@ For a new version, the files you will most often touch are:
 
 Schema references:
 
-- `catalog/schemas/version_profile.schema.json`
-- `catalog/schemas/patch_recipe.schema.json`
-- `catalog/schemas/build_recipe.schema.json`
-- `catalog/schemas/verify_recipe.schema.json`
+- [`../catalog/schemas/version_profile.schema.json`](../catalog/schemas/version_profile.schema.json)
+- [`../catalog/schemas/patch_recipe.schema.json`](../catalog/schemas/patch_recipe.schema.json)
+- [`../catalog/schemas/build_recipe.schema.json`](../catalog/schemas/build_recipe.schema.json)
+- [`../catalog/schemas/verify_recipe.schema.json`](../catalog/schemas/verify_recipe.schema.json)
 
 ## Recommended Order
 
@@ -53,6 +79,33 @@ Use this order. It keeps the work structured and reduces false starts.
 7. add the new files to `catalog/catalog.json`
 8. run the full validation and build chain
 9. only then promote the status from `candidate` to `verified_local`
+
+## Copy-The-Closest-Version Rule
+
+Do not start from an empty JSON file unless you have no nearby version to copy.
+
+The safest maintainer pattern is:
+
+1. choose the closest already-supported ST version
+2. copy its payload package
+3. copy its patch recipe
+4. copy its profile
+5. copy its build recipe only if the new version actually needs one
+6. rename ids and paths
+7. tighten anchors only where the new version moved
+
+This keeps the new support entry aligned with the same resource model used by
+the program, the CLI, and the manual docs.
+
+Example PowerShell starter commands for a hypothetical `15.1.rel1`:
+
+```powershell
+Copy-Item -Recurse -Force .\ld_patcher\payloads\json_patch_v10_st_ld_14_3_rel1 .\ld_patcher\payloads\json_patch_v10_st_ld_15_1_rel1
+Copy-Item -Force .\ld_patcher\catalog\recipes\patch\json_patch_v10_st_ld_14_3_rel1.json .\ld_patcher\catalog\recipes\patch\json_patch_v10_st_ld_15_1_rel1.json
+Copy-Item -Force .\ld_patcher\catalog\profiles\st_gnu_tools_for_stm32_14_3_rel1.json .\ld_patcher\catalog\profiles\st_gnu_tools_for_stm32_15_1_rel1.json
+```
+
+Then edit the copied files instead of inventing a parallel structure.
 
 ## Step 1: Inspect The New ST Source Package
 
@@ -79,8 +132,16 @@ The main source files to inspect are usually:
 
 Use the current supported versions as references:
 
-- `catalog/profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json`
-- `catalog/profiles/st_gnu_tools_for_stm32_14_3_rel1.json`
+- [`../catalog/profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json`](../catalog/profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json)
+- [`../catalog/profiles/st_gnu_tools_for_stm32_14_3_rel1.json`](../catalog/profiles/st_gnu_tools_for_stm32_14_3_rel1.json)
+
+Practical beginner maintainer tip:
+
+- do this inspection against both:
+  - the new untouched ST source tree
+  - the nearest already-supported source tree
+
+That way you can compare anchor shapes side by side instead of guessing.
 
 ## Step 2: Decide Whether You Need A New Payload Package
 
@@ -93,8 +154,8 @@ It contains:
 
 Current examples:
 
-- `payloads/json_patch_v10_st_ld_13_3_rel1_20250523_0900`
-- `payloads/json_patch_v10_st_ld_14_3_rel1`
+- [`../payloads/json_patch_v10_st_ld_13_3_rel1_20250523_0900/`](../payloads/json_patch_v10_st_ld_13_3_rel1_20250523_0900/)
+- [`../payloads/json_patch_v10_st_ld_14_3_rel1/`](../payloads/json_patch_v10_st_ld_14_3_rel1/)
 
 Use the existing payload package unchanged if:
 
@@ -113,6 +174,26 @@ Recommended practice:
 - rename it to a version-specific directory
 - edit only the files that truly changed
 
+Check these payload files one by one:
+
+- `ldjson_options.def`
+- `ldjson_compat.h`
+- `ldscript_json_impl.inc`
+- `hooks/ld.h.fragment`
+- `hooks/ldlex.h.fragment`
+- `hooks/lexsup_options.fragment`
+- `hooks/lexsup_switch.fragment`
+- `hooks/ldlang_include.fragment`
+- `hooks/ldlang_runtime.fragment`
+- `hooks/pex-win32.fragment`
+- `hooks/Makefile.am.fragment`
+
+If the new ST version only moved anchors but the inserted text stays the same,
+you often need:
+
+- a new patch recipe
+- but not a new payload package
+
 Example:
 
 ```text
@@ -125,8 +206,8 @@ The patch recipe is where compatibility and operations are defined.
 
 Current examples:
 
-- `catalog/recipes/patch/json_patch_v10_st_ld.json`
-- `catalog/recipes/patch/json_patch_v10_st_ld_14_3_rel1.json`
+- [`../catalog/recipes/patch/json_patch_v10_st_ld.json`](../catalog/recipes/patch/json_patch_v10_st_ld.json)
+- [`../catalog/recipes/patch/json_patch_v10_st_ld_14_3_rel1.json`](../catalog/recipes/patch/json_patch_v10_st_ld_14_3_rel1.json)
 
 The patch recipe controls:
 
@@ -156,6 +237,11 @@ For a new ST version, the most common reason to fork a patch recipe is:
 - one or more `match_regex` anchors moved
 - a previously unique anchor is now ambiguous
 - a new fallback hook is needed for a changed source file
+
+Beginner maintainer rule:
+
+- if the inserted text stays the same, change the anchor regex first
+- only edit the payload fragment when the inserted text itself must change
 
 Typical patch operation types in the current engine:
 
@@ -202,8 +288,8 @@ The build recipe describes how to build the patched linker.
 
 Current examples:
 
-- `catalog/recipes/build/msys2_mingw64_st_ld_13_3_verified.json`
-- `catalog/recipes/build/msys2_mingw64_st_ld_14_3_verified.json`
+- [`../catalog/recipes/build/msys2_mingw64_st_ld_13_3_verified.json`](../catalog/recipes/build/msys2_mingw64_st_ld_13_3_verified.json)
+- [`../catalog/recipes/build/msys2_mingw64_st_ld_14_3_verified.json`](../catalog/recipes/build/msys2_mingw64_st_ld_14_3_verified.json)
 
 If the new version builds the same way, the simplest rule is:
 
@@ -251,8 +337,8 @@ until build really succeeds in practice.
 
 The active profiles currently use:
 
-- `catalog/recipes/verify/sanity_cli.json`
-- `catalog/recipes/verify/json_smoke_self_contained.json`
+- [`../catalog/recipes/verify/sanity_cli.json`](../catalog/recipes/verify/sanity_cli.json)
+- [`../catalog/recipes/verify/json_smoke_self_contained.json`](../catalog/recipes/verify/json_smoke_self_contained.json)
 
 In many cases, you do not need a new verify recipe for a new version.
 
@@ -274,8 +360,8 @@ The profile ties everything together.
 
 Current examples:
 
-- `catalog/profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json`
-- `catalog/profiles/st_gnu_tools_for_stm32_14_3_rel1.json`
+- [`../catalog/profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json`](../catalog/profiles/st_gnu_tools_for_stm32_13_3_rel1_20250523_0900.json)
+- [`../catalog/profiles/st_gnu_tools_for_stm32_14_3_rel1.json`](../catalog/profiles/st_gnu_tools_for_stm32_14_3_rel1.json)
 
 The profile defines:
 
@@ -359,6 +445,15 @@ ld_patcher.exe --verify st_gnu_tools_for_stm32_15_1_rel1 C:\work\trees\gnu-tools
 ld_patcher.exe --package C:\work\trees\gnu-tools-for-stm32-15.1.rel1\build\gnu-tools-for-stm32-15.1.rel1_msys2_mingw64_st_ld_15_1_verified_drop C:\work\trees\gnu-tools-for-stm32-15.1.rel1\build\_cubeide-arm-linker-st-15.1.rel1-jsonpatch
 ```
 
+What you are looking for at this stage:
+
+- `--detect` finds the intended profile
+- `--validate` says the patch recipe is applicable
+- `--apply` creates the copied files and glue markers in the ST source tree
+- `--build` leaves a usable drop dir with linker binaries
+- `--verify` leaves `_verify_smoke_self\...` artifacts
+- `--package` creates the final CubeIDE package directory
+
 ### What Success Means
 
 Do not call a version supported until all of these are true:
@@ -432,8 +527,8 @@ Do not create a second standalone patch bundle outside `ld_patcher`.
 
 The intended model is:
 
-- program workflow uses `payloads/` and `catalog/`
-- manual workflow uses those same `payloads/` and `verify_assets/`
+- program workflow uses [`../payloads/`](../payloads/) and [`../catalog/`](../catalog/)
+- manual workflow uses those same [`../payloads/`](../payloads/) and [`../verify_assets/`](../verify_assets/)
 
 If you update support for a new version, update both:
 
@@ -441,3 +536,10 @@ If you update support for a new version, update both:
 - the manual docs that describe how to use the same payload package by hand
 
 The shared source of truth is the important part.
+
+## See Also
+
+- [Prerequisites](PREREQUISITES.md)
+- [CLI Reference](CLI_REFERENCE.md)
+- [Manual Patch Package](MANUAL_PATCH_PACKAGE.md)
+- [Manual Workflow](MANUAL_WORKFLOW.md)

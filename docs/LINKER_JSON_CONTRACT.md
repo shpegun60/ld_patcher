@@ -2,6 +2,41 @@
 
 This document is the current canonical contract for `--dump-script-json`.
 
+## Who This Document Is For
+
+Read this document if:
+
+- you are writing a parser that consumes the JSON emitted by the patched linker
+- you are checking whether a new linker build still follows the agreed format
+- you are adding support for a new ST release and need to confirm that the
+  output contract did not accidentally change
+
+Do not start with this document if your goal is only:
+
+- to patch a source tree
+- to build the linker
+- to connect the linker to STM32CubeIDE
+
+For those tasks, start with:
+
+- [Manual Workflow](MANUAL_WORKFLOW.md)
+- [CLI Reference](CLI_REFERENCE.md)
+- [CubeIDE Integration](CUBEIDE_INTEGRATION.md)
+
+## How To Use This Contract
+
+Treat this file as the normative shape description for the JSON produced by the
+patched linker.
+
+Practical rule:
+
+- if an example JSON file and this contract ever disagree, treat this contract
+  as the authority and update the examples or the code accordingly
+
+Reference samples live in:
+
+- [`reference_samples/`](reference_samples/)
+
 ## Top-Level Keys
 
 The canonical top-level keys are:
@@ -214,4 +249,10 @@ Parsers should:
 
 Reference samples live under:
 
-- `docs/reference_samples/`
+- [`reference_samples/`](reference_samples/)
+
+## See Also
+
+- [Manual Workflow](MANUAL_WORKFLOW.md)
+- [CLI Reference](CLI_REFERENCE.md)
+- [CubeIDE Integration](CUBEIDE_INTEGRATION.md)

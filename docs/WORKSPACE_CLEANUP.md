@@ -13,6 +13,25 @@ The target state is:
   - `ld_viewer`
 - optional source archives/source trees kept only as inputs
 
+## Read This Before Deleting Anything
+
+This document is intentionally conservative.
+
+The idea is:
+
+- keep the files that are still part of the active `ld_patcher` workflow
+- delete only the old helper/build folders that are now duplicated by the
+  maintained docs and scripts inside `ld_patcher`
+
+Beginner-safe rule:
+
+- if you are unsure whether a folder is still needed, do not delete it yet
+- first check whether the same information now exists inside:
+  - [`../README.md`](../README.md)
+  - [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
+  - [`MANUAL_PATCH_PACKAGE.md`](MANUAL_PATCH_PACKAGE.md)
+  - [`../scripts/manual_reference/`](../scripts/manual_reference/)
+
 ## Knowledge Now Preserved Inside `ld_patcher`
 
 `ld_patcher` now contains:
@@ -82,3 +101,15 @@ So:
 7. remove old root helper files if they are no longer needed outside
    `ld_patcher`
 
+## Final Safety Check
+
+Before you delete the old workspace folders, make sure all of the following are
+true:
+
+- the docs you actually use now are inside `ld_patcher/docs/`
+- the helper scripts you still need are inside [`../scripts/manual_reference/`](../scripts/manual_reference/)
+- the payloads you still need are inside [`../payloads/`](../payloads/)
+- you no longer depend on the old top-level `json_patch` folder as a separate
+  source of truth
+
+If all four are true, cleanup is usually safe.
