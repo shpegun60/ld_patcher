@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT=${LDPATCHER_WORKSPACE_ROOT:-/c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32}
-SRC=${LDPATCHER_SOURCE_ROOT:-$ROOT/gnu-tools-for-stm32-13.3.rel1.20250523-0900}
+SRC=${LDPATCHER_SOURCE_ROOT:-}
 OUT=${LDPATCHER_OUT_DIR:-$ROOT/manual_build}
 BLD=${LDPATCHER_BUILD_DIR:-$OUT/_build-ld-st-manual}
 INS=${LDPATCHER_INSTALL_DIR:-$OUT/_install-ld-st-manual}
@@ -11,6 +11,11 @@ PKGVER=${LDPATCHER_DISPLAY_VERSION:-manual}
 JOBS=${JOBS:-$(nproc)}
 
 export PATH=/mingw64/bin:/usr/bin
+
+if [ -z "$SRC" ]; then
+  echo "LDPATCHER_SOURCE_ROOT is required. Point it at an extracted ST source tree." >&2
+  exit 2
+fi
 
 echo "LDPATCHER_PROGRESS 5 Preparing build directories"
 rm -rf "$BLD" "$INS" "$DROP"
@@ -50,4 +55,3 @@ cp /mingw64/bin/libzstd.dll "$DROP/libzstd.dll"
 echo "LDPATCHER_PROGRESS 98 Checking ld.exe --help"
 "$DROP/ld.exe" --help | grep -q "dump-script-json"
 echo "LDPATCHER_PROGRESS 100 Manual build completed"
-

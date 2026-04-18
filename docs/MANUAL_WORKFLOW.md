@@ -821,6 +821,11 @@ Useful variables:
 - `LDPATCHER_DROP_DIR`
 - `LDPATCHER_DISPLAY_VERSION`
 
+Important:
+
+- set `LDPATCHER_SOURCE_ROOT` explicitly
+- the maintained manual scripts no longer assume one hard-coded extracted source-tree name
+
 Minimal example for `13.3` from MSYS2 MINGW64:
 
 ```bash

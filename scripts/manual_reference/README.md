@@ -10,6 +10,11 @@ Current primary script:
 
 - `build_st_ld_manual.sh`
 
+Important:
+
+- the manual build scripts now expect `LDPATCHER_SOURCE_ROOT` to be set explicitly
+- this avoids hidden dependence on one old extracted source-tree name in the workspace
+
 Core helper scripts:
 
 - `copy_patch_payload.ps1`
