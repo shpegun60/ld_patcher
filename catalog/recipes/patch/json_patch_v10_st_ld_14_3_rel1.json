@@ -6,7 +6,7 @@
     "id":  "json_patch_v10_st_ld_14_3_rel1",
     "display_name":  "json_patch v10 for ST GNU ld 14.3.rel1",
     "description":  "Applies the internal 14.3.rel1 json_patch payload package into src/binutils/ld by copying the implementation files and inserting the documented glue fragments.",
-    "status":  "candidate",
+    "status":  "verified_local",
     "supported_families":  [
                                "st-gnu-tools-for-stm32"
                            ],
@@ -283,12 +283,13 @@
     "compatibility_result_mapping":  {
                                          "all_blocking_checks_pass":  "candidate",
                                          "verified_local_profiles":  [
-                                                                         "st_gnu_tools_for_stm32_13_3_rel1_20250523_0900"
+                                                                         "st_gnu_tools_for_stm32_13_3_rel1_20250523_0900",
+                                                                         "st_gnu_tools_for_stm32_14_3_rel1"
                                                                      ]
                                      },
     "notes":  [
                   "This recipe is scoped to the internal 14.3.rel1 payload package under ld_patcher/payloads.",
                   "The runtime-call anchor is narrowed to the finalized lang_process() tail so it stays unambiguous on 14.3.rel1.",
-                  "Apply/build verification still needs to be completed locally before this recipe should be promoted beyond candidate."
+                  "This recipe is locally verified for extract, apply, build, verify, and CubeIDE packaging on 14.3.rel1 in this workspace."
               ]
 }

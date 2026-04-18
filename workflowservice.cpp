@@ -624,7 +624,8 @@ QHash<QString, QString> toShellVariables(const QHash<QString, QString> &windowsV
     QHash<QString, QString> vars = windowsVariables;
     const QStringList pathKeys = {
         QStringLiteral("workspace_root"), QStringLiteral("source_root"), QStringLiteral("working_root"),
-        QStringLiteral("build_dir"), QStringLiteral("install_dir"), QStringLiteral("drop_dir")
+        QStringLiteral("build_dir"), QStringLiteral("install_dir"), QStringLiteral("drop_dir"),
+        QStringLiteral("package_dir")
     };
     for (const QString &key : pathKeys) {
         if (vars.contains(key)) {
@@ -1970,6 +1971,14 @@ VerifyResult WorkflowService::verifyBuild(const CatalogData &catalog,
 
             recipeRun.checks.append(checkRun);
             recipeRun.messages.append(QStringLiteral("%1: %2").arg(check.description, checkRun.passed ? QStringLiteral("PASS") : QStringLiteral("FAIL")));
+            emitLog(logCallback,
+                    QStringLiteral("Verify check [%1]: %2 | %3")
+                        .arg(recipe.displayName,
+                             check.description,
+                             checkRun.passed ? QStringLiteral("PASS") : QStringLiteral("FAIL")));
+            if (!checkRun.detail.isEmpty()) {
+                emitLog(logCallback, QStringLiteral("  detail: %1").arg(checkRun.detail));
+            }
             if (!checkRun.passed && recipe.allChecksMustPass) {
                 recipeFailed = true;
             }
@@ -1992,6 +2001,15 @@ VerifyResult WorkflowService::verifyBuild(const CatalogData &catalog,
         recipeRun.ok = !recipeFailed;
         result.recipes.append(recipeRun);
         if (!recipeRun.ok && recipe.allChecksMustPass) {
+            for (const VerifyCheckRunResult &failedCheck : recipeRun.checks) {
+                if (!failedCheck.passed) {
+                    emitLog(logCallback,
+                            QStringLiteral("Verify recipe failed at check: %1").arg(failedCheck.description));
+                    if (!failedCheck.detail.isEmpty()) {
+                        emitLog(logCallback, QStringLiteral("  failure detail: %1").arg(failedCheck.detail));
+                    }
+                }
+            }
             result.errorMessage = QStringLiteral("Verify recipe failed: %1").arg(recipe.displayName);
             return result;
         }

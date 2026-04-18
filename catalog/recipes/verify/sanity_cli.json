@@ -6,7 +6,7 @@
   "id": "sanity_cli",
   "display_name": "CLI sanity checks",
   "description": "Minimal command-line checks for a built ld.exe artifact.",
-  "status": "candidate",
+  "status": "verified_local",
   "checks": [
     {
       "type": "file_exists",
@@ -47,6 +47,6 @@
   },
   "result_artifacts": [],
   "notes": [
-    "This recipe is generic and should be runnable for any built artifact folder."
+    "This recipe is locally verified against the 13.3.rel1 and 14.3.rel1 STM32 linker drops produced by ld_patcher in this workspace."
   ]
 }

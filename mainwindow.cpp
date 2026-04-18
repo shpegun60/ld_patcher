@@ -680,6 +680,7 @@ bool MainWindow::workflowStepVisible(WorkflowStepId id) const
     const bool alreadyPatched = (m_workflowState.inputValidation.ok && m_workflowState.inputValidation.validation.alreadyPatched)
                                 || (m_workflowState.workingValidation.ok && m_workflowState.workingValidation.validation.alreadyPatched)
                                 || (m_workflowState.apply.ok && m_workflowState.apply.validation.validation.alreadyPatched);
+    const WorkflowStepEntry *applyEntry = stepEntry(WorkflowStepId::Apply);
 
     switch (id) {
     case WorkflowStepId::AnalyzeInput:
@@ -693,6 +694,9 @@ bool MainWindow::workflowStepVisible(WorkflowStepId id) const
     case WorkflowStepId::ValidateWorking:
         return isZip;
     case WorkflowStepId::Apply:
+        if (applyEntry != nullptr && applyEntry->state != WorkflowStepState::Pending) {
+            return true;
+        }
         return !alreadyPatched;
     }
     return true;
