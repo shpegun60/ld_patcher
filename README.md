@@ -266,7 +266,7 @@ Everything needed for the active patch/build/verify flow is kept inside `ld_patc
 The active workflow no longer depends on:
 
 - old numbered workspace build folders
-- the old top-level `json_patch` folder
+- old external patch-package folders
 - any external STM32 sample project
 
 The workspace-specific documentation and manual knowledge now live directly

@@ -4,8 +4,8 @@ This document explains the current manual patch package model.
 
 ## Source Of Truth
 
-The current source of truth for manual patching is no longer an external
-top-level `json_patch/` folder.
+The current source of truth for manual patching lives inside `ld_patcher`
+itself.
 
 The current patch packages live inside `ld_patcher` itself:
 

@@ -37,6 +37,19 @@ Reference samples live in:
 
 - [`reference_samples/`](reference_samples/)
 
+Optional validator:
+
+- [`reference_samples/validate_core.jq`](reference_samples/validate_core.jq)
+
+If you want a quick contract check outside the application, you can run:
+
+```text
+jq -e -f reference_samples/validate_core.jq out.json
+```
+
+That validator is a useful reference tool, but this document remains the
+normative source of truth for the contract shape.
+
 ## Top-Level Keys
 
 The canonical top-level keys are:

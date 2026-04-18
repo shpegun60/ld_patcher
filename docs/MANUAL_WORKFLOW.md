@@ -997,6 +997,18 @@ Success looks like:
 - the JSON file is not empty
 - opening the JSON file shows top-level keys like `format`, `output`, and `memory_regions`
 
+Optional extra contract validation with `jq`:
+
+```powershell
+jq -e -f .\ld_patcher\docs\reference_samples\validate_core.jq `
+  "C:\path\to\drop-dir\_verify_smoke_self\ldpatcher_self_smoke.json"
+```
+
+Success looks like:
+
+- `jq` exits with code `0`
+- it prints a small success object instead of contract errors
+
 Current helper script file:
 
 - [`../scripts/manual_reference/verify_drop_self_contained.ps1`](../scripts/manual_reference/verify_drop_self_contained.ps1)
