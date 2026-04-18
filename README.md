@@ -121,6 +121,34 @@ Current `ld_patcher` GUI:
 
 ![ld_patcher GUI](img/qt.png)
 
+## Documentation
+
+One current documentation set lives in:
+
+- `docs/DOCUMENTATION_MAP.md`
+
+Primary documents:
+
+- `docs/MANUAL_WORKFLOW.md`
+- `docs/CLI_REFERENCE.md`
+- `docs/CUBEIDE_INTEGRATION.md`
+- `docs/MANUAL_PATCH_PACKAGE.md`
+- `docs/ADDING_SUPPORT.md`
+- `docs/LINKER_JSON_CONTRACT.md`
+- `docs/WORKSPACE_CLEANUP.md`
+
+Manual helper scripts live in:
+
+- `scripts/manual_reference/`
+
+These manual helpers are wired to the same current payload packages and
+self-contained verify assets used by the application workflow, and the same
+current script contents are embedded inline in `docs/MANUAL_WORKFLOW.md`.
+
+Reference sample outputs live in:
+
+- `docs/reference_samples/`
+
 ## What Lives Inside `ld_patcher`
 
 Everything needed for the active patch/build/verify flow is kept inside `ld_patcher`:
@@ -143,6 +171,10 @@ The active workflow no longer depends on sibling folders such as:
 - `ld_sniffer`
 - `ld_viewer`
 - any external STM32 sample project
+
+The workspace-specific documentation and manual knowledge now live directly
+inside this repository in the canonical docs and `scripts/manual_reference/`
+layout, so they no longer need to remain scattered across old helper folders.
 
 External tools still needed at runtime:
 
@@ -423,6 +455,9 @@ It follows the patch recipe data:
 - operation types
 - target/source paths
 
+The current manual workflow uses these same payload packages as its source of
+truth rather than maintaining a second external patch bundle.
+
 ## CLI
 
 The CLI uses the same backend as the GUI.
@@ -441,6 +476,14 @@ The CLI uses the same backend as the GUI.
   - `ld_patcher.exe --verify <profile-id> <drop-dir> [cubeide-path]`
 - package:
   - `ld_patcher.exe --package <source-drop-dir> <package-dir>`
+
+Full CLI reference:
+
+- `docs/CLI_REFERENCE.md`
+
+If you want to add support for a new ST version:
+
+- `docs/ADDING_SUPPORT.md`
 
 ## Current Limitations
 
@@ -475,3 +518,5 @@ If you want to move it to another machine right now:
 - copy the whole `ld_patcher` folder
 
 That is the safest transfer unit today.
+
+

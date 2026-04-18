@@ -1,0 +1,769 @@
+﻿{
+    "format":  {
+                   "name":  "ldscript-json",
+                   "major":  10,
+                   "minor":  0
+               },
+    "output":  {
+                   "entry_symbol":  "0x8000529"
+               },
+    "memory_regions":  {
+                           "items":  [
+                                         {
+                                             "id":  "r000001",
+                                             "name":  "RAM",
+                                             "origin_hex":  "0x24000000",
+                                             "length_hex":  "0x71c00",
+                                             "attrs":  {
+                                                           "required":  "xrw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x38",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000002",
+                                             "name":  "RAM_NONCACHEABLEBUFFER",
+                                             "origin_hex":  "0x24071c00",
+                                             "length_hex":  "0x400",
+                                             "attrs":  {
+                                                           "required":  "xrw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x38",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000003",
+                                             "name":  "ITCM",
+                                             "origin_hex":  "0x0",
+                                             "length_hex":  "0x10000",
+                                             "attrs":  {
+                                                           "required":  "xrw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x38",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000004",
+                                             "name":  "DTCM",
+                                             "origin_hex":  "0x20000000",
+                                             "length_hex":  "0x10000",
+                                             "attrs":  {
+                                                           "required":  "rw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x28",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000005",
+                                             "name":  "SRAMAHB",
+                                             "origin_hex":  "0x30000000",
+                                             "length_hex":  "0x8000",
+                                             "attrs":  {
+                                                           "required":  "rw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x28",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000006",
+                                             "name":  "BKPSRAM",
+                                             "origin_hex":  "0x38800000",
+                                             "length_hex":  "0x1000",
+                                             "attrs":  {
+                                                           "required":  "rw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x28",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000007",
+                                             "name":  "FLASH",
+                                             "origin_hex":  "0x8000000",
+                                             "length_hex":  "0x10000",
+                                             "attrs":  {
+                                                           "required":  "xrw",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x38",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "r000008",
+                                             "name":  "*default*",
+                                             "origin_hex":  "0x0",
+                                             "length_hex":  "0xffffffffffffffff",
+                                             "attrs":  {
+                                                           "required":  "",
+                                                           "forbidden":  "",
+                                                           "flags_hex":  "0x0",
+                                                           "not_flags_hex":  "0x0"
+                                                       }
+                                         }
+                                     ],
+                           "by_name":  {
+                                           "RAM":  [
+                                                       "r000001"
+                                                   ],
+                                           "RAM_NONCACHEABLEBUFFER":  [
+                                                                          "r000002"
+                                                                      ],
+                                           "ITCM":  [
+                                                        "r000003"
+                                                    ],
+                                           "DTCM":  [
+                                                        "r000004"
+                                                    ],
+                                           "SRAMAHB":  [
+                                                           "r000005"
+                                                       ],
+                                           "BKPSRAM":  [
+                                                           "r000006"
+                                                       ],
+                                           "FLASH":  [
+                                                         "r000007"
+                                                     ],
+                                           "*default*":  [
+                                                             "r000008"
+                                                         ]
+                                       },
+                           "null_name_ids":  [
+
+                                             ]
+                       },
+    "output_sections":  {
+                            "items":  [
+                                          {
+                                              "id":  "s000002",
+                                              "name":  ".isr_vector",
+                                              "vma_region":  "FLASH",
+                                              "lma_region":  null,
+                                              "vma_hex":  "0x8000000",
+                                              "lma_hex":  "0x8000000",
+                                              "size_hex":  "0x2b0",
+                                              "flags":  {
+                                                            "letters":  "ar",
+                                                            "hex":  "0x20012b"
+                                                        },
+                                              "script_subsections":  [
+                                                                         "*(.isr_vector)"
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000003",
+                                              "name":  ".text",
+                                              "vma_region":  "FLASH",
+                                              "lma_region":  null,
+                                              "vma_hex":  "0x80002b0",
+                                              "lma_hex":  "0x80002b0",
+                                              "size_hex":  "0x2734",
+                                              "flags":  {
+                                                            "letters":  "ax",
+                                                            "hex":  "0x30413b"
+                                                        },
+                                              "script_subsections":  [
+                                                                         "*(.text)",
+                                                                         "*(.text*)",
+                                                                         "*(.glue_7)",
+                                                                         "*(.glue_7t)",
+                                                                         "*(.eh_frame)",
+                                                                         "*(.init)",
+                                                                         "*(.fini)"
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000014",
+                                              "name":  ".data",
+                                              "vma_region":  "RAM",
+                                              "lma_region":  "FLASH",
+                                              "vma_hex":  "0x24000000",
+                                              "lma_hex":  "0x8002a00",
+                                              "size_hex":  "0x5c",
+                                              "flags":  {
+                                                            "letters":  "aw",
+                                                            "hex":  "0x200123"
+                                                        },
+                                              "script_subsections":  [
+                                                                         "*(.data)",
+                                                                         "*(.data*)",
+                                                                         "*(.RamFunc)",
+                                                                         "*(.RamFunc*)"
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000016",
+                                              "name":  ".bss",
+                                              "vma_region":  "RAM",
+                                              "lma_region":  "FLASH",
+                                              "vma_hex":  "0x24000060",
+                                              "lma_hex":  "0x8002a5c",
+                                              "size_hex":  "0xe8c",
+                                              "flags":  {
+                                                            "letters":  "aw",
+                                                            "hex":  "0x200001"
+                                                        },
+                                              "script_subsections":  [
+                                                                         "*(.bss)",
+                                                                         "*(.bss*)",
+                                                                         "*(COMMON)"
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000017",
+                                              "name":  "RW_NONCACHEABLE",
+                                              "vma_region":  "RAM_NONCACHEABLEBUFFER",
+                                              "lma_region":  null,
+                                              "vma_hex":  "0x24071c00",
+                                              "lma_hex":  "0x24071c00",
+                                              "size_hex":  "0x0",
+                                              "flags":  {
+                                                            "letters":  "",
+                                                            "hex":  "0x8000"
+                                                        },
+                                              "script_subsections":  [
+                                                                         "*(noncacheable_buffer)"
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000018",
+                                              "name":  "._user_heap_stack",
+                                              "vma_region":  "DTCM",
+                                              "lma_region":  null,
+                                              "vma_hex":  "0x20000000",
+                                              "lma_hex":  "0x20000000",
+                                              "size_hex":  "0x600",
+                                              "flags":  {
+                                                            "letters":  "aw",
+                                                            "hex":  "0x200001"
+                                                        },
+                                              "script_subsections":  [
+
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000019",
+                                              "name":  "/DISCARD/",
+                                              "vma_region":  "*default*",
+                                              "lma_region":  null,
+                                              "vma_hex":  null,
+                                              "lma_hex":  null,
+                                              "size_hex":  null,
+                                              "script_subsections":  [
+                                                                         "libc.a(*)",
+                                                                         "libm.a(*)",
+                                                                         "libgcc.a(*)"
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000026",
+                                              "name":  ".debug_str",
+                                              "vma_region":  "*default*",
+                                              "lma_region":  null,
+                                              "vma_hex":  "0x0",
+                                              "lma_hex":  "0x0",
+                                              "size_hex":  "0x1979a",
+                                              "flags":  {
+                                                            "letters":  "r",
+                                                            "hex":  "0x41802108"
+                                                        },
+                                              "script_subsections":  [
+
+                                                                     ]
+                                          },
+                                          {
+                                              "id":  "s000027",
+                                              "name":  ".comment",
+                                              "vma_region":  "*default*",
+                                              "lma_region":  null,
+                                              "vma_hex":  "0x0",
+                                              "lma_hex":  "0x0",
+                                              "size_hex":  "0x43",
+                                              "flags":  {
+                                                            "letters":  "r",
+                                                            "hex":  "0x1800108"
+                                                        },
+                                              "script_subsections":  [
+
+                                                                     ]
+                                          }
+                                      ],
+                            "by_name":  {
+                                            ".isr_vector":  [
+                                                                "s000002"
+                                                            ],
+                                            ".text":  [
+                                                          "s000003"
+                                                      ],
+                                            ".data":  [
+                                                          "s000014"
+                                                      ],
+                                            ".bss":  [
+                                                         "s000016"
+                                                     ],
+                                            "RW_NONCACHEABLE":  [
+                                                                    "s000017"
+                                                                ],
+                                            "._user_heap_stack":  [
+                                                                      "s000018"
+                                                                  ],
+                                            "/DISCARD/":  [
+                                                              "s000019"
+                                                          ],
+                                            ".debug_str":  [
+                                                               "s000026"
+                                                           ],
+                                            ".comment":  [
+                                                             "s000027"
+                                                         ]
+                                        },
+                            "null_name_ids":  [
+
+                                              ]
+                        },
+    "input_sections":  {
+                           "items":  [
+                                         {
+                                             "id":  "is000001",
+                                             "name":  ".text",
+                                             "discarded":  true,
+                                             "output_section_id":  null,
+                                             "owner_file":  "C:/ST/STM32CubeIDE_2.0.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+dp/hard/crti.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x0",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "ax",
+                                                           "hex":  "0x811b"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000002",
+                                             "name":  ".data",
+                                             "discarded":  true,
+                                             "output_section_id":  null,
+                                             "owner_file":  "C:/ST/STM32CubeIDE_2.0.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+dp/hard/crti.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x0",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "aw",
+                                                           "hex":  "0x8123"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000003",
+                                             "name":  ".bss",
+                                             "discarded":  true,
+                                             "output_section_id":  null,
+                                             "owner_file":  "C:/ST/STM32CubeIDE_2.0.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+dp/hard/crti.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x0",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "aw",
+                                                           "hex":  "0x8001"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000009",
+                                             "name":  ".bss",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000016",
+                                             "owner_file":  "C:/ST/STM32CubeIDE_2.0.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.14.3.rel1.win32_1.0.100.202602081740/tools/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+dp/hard/crtbegin.o",
+                                             "value_hex":  "0x24000060",
+                                             "size_hex":  "0x1c",
+                                             "output_offset_hex":  "0x0",
+                                             "flags":  {
+                                                           "letters":  "aw",
+                                                           "hex":  "0x1"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000021",
+                                             "name":  ".text",
+                                             "discarded":  true,
+                                             "output_section_id":  null,
+                                             "owner_file":  "./Core/Src/gpio.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x0",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "ax",
+                                                           "hex":  "0x811b"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000030",
+                                             "name":  ".debug_str",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000026",
+                                             "owner_file":  "./Core/Src/gpio.o",
+                                             "value_hex":  "0x0",
+                                             "size_hex":  "0x1979a",
+                                             "output_offset_hex":  "0x0",
+                                             "flags":  {
+                                                           "letters":  "r",
+                                                           "hex":  "0x41802108"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000031",
+                                             "name":  ".comment",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000027",
+                                             "owner_file":  "./Core/Src/gpio.o",
+                                             "value_hex":  "0x0",
+                                             "size_hex":  "0x43",
+                                             "output_offset_hex":  "0x0",
+                                             "flags":  {
+                                                           "letters":  "r",
+                                                           "hex":  "0x1800108"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000037",
+                                             "name":  ".text.SystemClock_Config",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000003",
+                                             "owner_file":  "./Core/Src/main.o",
+                                             "value_hex":  "0x8000380",
+                                             "size_hex":  "0xa0",
+                                             "output_offset_hex":  "0xd0",
+                                             "flags":  {
+                                                           "letters":  "ax",
+                                                           "hex":  "0x11f"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000038",
+                                             "name":  ".text.startup.main",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000003",
+                                             "owner_file":  "./Core/Src/main.o",
+                                             "value_hex":  "0x8000420",
+                                             "size_hex":  "0x44",
+                                             "output_offset_hex":  "0x170",
+                                             "flags":  {
+                                                           "letters":  "ax",
+                                                           "hex":  "0x11f"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000045",
+                                             "name":  ".debug_str",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000026",
+                                             "owner_file":  "./Core/Src/main.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x53d",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "r",
+                                                           "hex":  "0x41a0a108"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000046",
+                                             "name":  ".comment",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000027",
+                                             "owner_file":  "./Core/Src/main.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x44",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "r",
+                                                           "hex":  "0x1a08108"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000150",
+                                             "name":  ".text.Reset_Handler",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000003",
+                                             "owner_file":  "./Core/Startup/startup_stm32h7s3l8hx.o",
+                                             "value_hex":  "0x8000528",
+                                             "size_hex":  "0x50",
+                                             "output_offset_hex":  "0x278",
+                                             "flags":  {
+                                                           "letters":  "ax",
+                                                           "hex":  "0x20011f"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000151",
+                                             "name":  ".text.Default_Handler",
+                                             "discarded":  false,
+                                             "output_section_id":  "s000003",
+                                             "owner_file":  "./Core/Startup/startup_stm32h7s3l8hx.o",
+                                             "value_hex":  "0x8000578",
+                                             "size_hex":  "0x2",
+                                             "output_offset_hex":  "0x2c8",
+                                             "flags":  {
+                                                           "letters":  "ax",
+                                                           "hex":  "0x11b"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000307",
+                                             "name":  ".debug_str",
+                                             "discarded":  true,
+                                             "output_section_id":  null,
+                                             "owner_file":  "./Drivers/STM32H7RSxx_HAL_Driver/stm32h7rsxx_hal_dma.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x9a5",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "r",
+                                                           "hex":  "0x4180a108"
+                                                       }
+                                         },
+                                         {
+                                             "id":  "is000308",
+                                             "name":  ".comment",
+                                             "discarded":  true,
+                                             "output_section_id":  null,
+                                             "owner_file":  "./Drivers/STM32H7RSxx_HAL_Driver/stm32h7rsxx_hal_dma.o",
+                                             "value_hex":  null,
+                                             "size_hex":  "0x44",
+                                             "output_offset_hex":  null,
+                                             "flags":  {
+                                                           "letters":  "r",
+                                                           "hex":  "0x1808108"
+                                                       }
+                                         }
+                                     ],
+                           "by_name":  {
+                                           ".text":  [
+                                                         "is000001",
+                                                         "is000021"
+                                                     ],
+                                           ".data":  [
+                                                         "is000002"
+                                                     ],
+                                           ".bss":  [
+                                                        "is000003",
+                                                        "is000009"
+                                                    ],
+                                           ".debug_str":  [
+                                                              "is000030",
+                                                              "is000045",
+                                                              "is000307"
+                                                          ],
+                                           ".comment":  [
+                                                            "is000031",
+                                                            "is000046",
+                                                            "is000308"
+                                                        ],
+                                           ".text.SystemClock_Config":  [
+                                                                            "is000037"
+                                                                        ],
+                                           ".text.startup.main":  [
+                                                                      "is000038"
+                                                                  ],
+                                           ".text.Reset_Handler":  [
+                                                                       "is000150"
+                                                                   ],
+                                           ".text.Default_Handler":  [
+                                                                         "is000151"
+                                                                     ]
+                                       },
+                           "null_name_ids":  [
+
+                                             ]
+                       },
+    "discarded_input_sections":  [
+                                     {
+                                         "input_section_id":  "is000001",
+                                         "discard_reason":  "gc_sections"
+                                     },
+                                     {
+                                         "input_section_id":  "is000002",
+                                         "discard_reason":  "gc_sections"
+                                     },
+                                     {
+                                         "input_section_id":  "is000003",
+                                         "discard_reason":  "gc_sections"
+                                     },
+                                     {
+                                         "input_section_id":  "is000021",
+                                         "discard_reason":  "gc_sections"
+                                     },
+                                     {
+                                         "input_section_id":  "is000307",
+                                         "discard_reason":  "gc_sections"
+                                     },
+                                     {
+                                         "input_section_id":  "is000308",
+                                         "discard_reason":  "gc_sections"
+                                     }
+                                 ],
+    "symbols":  {
+                    "items":  [
+                                  {
+                                      "id":  "v000417",
+                                      "name":  "Reset_Handler",
+                                      "state":  "defined",
+                                      "value_hex":  "0x8000528",
+                                      "size_hex":  null,
+                                      "section":  ".text",
+                                      "output_section_id":  "s000003",
+                                      "input_section_id":  "is000150",
+                                      "script_defined":  false
+                                  },
+                                  {
+                                      "id":  "v000632",
+                                      "name":  "__FLASH_BEGIN",
+                                      "state":  "defined",
+                                      "value_hex":  "0x8000000",
+                                      "size_hex":  null,
+                                      "section":  "ABS",
+                                      "output_section_id":  null,
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000634",
+                                      "name":  "__NONCACHEABLEBUFFER_BEGIN",
+                                      "state":  "defined",
+                                      "value_hex":  "0x24071c00",
+                                      "size_hex":  null,
+                                      "section":  "RW_NONCACHEABLE",
+                                      "output_section_id":  "s000017",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000635",
+                                      "name":  "__NONCACHEABLEBUFFER_END",
+                                      "state":  "defined",
+                                      "value_hex":  "0x24071c00",
+                                      "size_hex":  null,
+                                      "section":  "RW_NONCACHEABLE",
+                                      "output_section_id":  "s000017",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000710",
+                                      "name":  "_ebss",
+                                      "state":  "defined",
+                                      "value_hex":  "0x24000eec",
+                                      "size_hex":  null,
+                                      "section":  ".bss",
+                                      "output_section_id":  "s000016",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000711",
+                                      "name":  "_edata",
+                                      "state":  "defined",
+                                      "value_hex":  "0x2400005c",
+                                      "size_hex":  null,
+                                      "section":  ".data",
+                                      "output_section_id":  "s000014",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000713",
+                                      "name":  "_estack",
+                                      "state":  "defined",
+                                      "value_hex":  "0x20010000",
+                                      "size_hex":  null,
+                                      "section":  "ABS",
+                                      "output_section_id":  null,
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000714",
+                                      "name":  "_etext",
+                                      "state":  "defined",
+                                      "value_hex":  "0x80029e4",
+                                      "size_hex":  null,
+                                      "section":  ".text",
+                                      "output_section_id":  "s000003",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000745",
+                                      "name":  "_sbss",
+                                      "state":  "defined",
+                                      "value_hex":  "0x24000060",
+                                      "size_hex":  null,
+                                      "section":  ".bss",
+                                      "output_section_id":  "s000016",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000746",
+                                      "name":  "_sdata",
+                                      "state":  "defined",
+                                      "value_hex":  "0x24000000",
+                                      "size_hex":  null,
+                                      "section":  ".data",
+                                      "output_section_id":  "s000014",
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  },
+                                  {
+                                      "id":  "v000747",
+                                      "name":  "_sidata",
+                                      "state":  "defined",
+                                      "value_hex":  "0x8002a00",
+                                      "size_hex":  null,
+                                      "section":  "ABS",
+                                      "output_section_id":  null,
+                                      "input_section_id":  null,
+                                      "script_defined":  true
+                                  }
+                              ],
+                    "by_name":  {
+                                    "Reset_Handler":  [
+                                                          "v000417"
+                                                      ],
+                                    "__FLASH_BEGIN":  [
+                                                          "v000632"
+                                                      ],
+                                    "__NONCACHEABLEBUFFER_BEGIN":  [
+                                                                       "v000634"
+                                                                   ],
+                                    "__NONCACHEABLEBUFFER_END":  [
+                                                                     "v000635"
+                                                                 ],
+                                    "_ebss":  [
+                                                  "v000710"
+                                              ],
+                                    "_edata":  [
+                                                   "v000711"
+                                               ],
+                                    "_estack":  [
+                                                    "v000713"
+                                                ],
+                                    "_etext":  [
+                                                   "v000714"
+                                               ],
+                                    "_sbss":  [
+                                                  "v000745"
+                                              ],
+                                    "_sdata":  [
+                                                   "v000746"
+                                               ],
+                                    "_sidata":  [
+                                                    "v000747"
+                                                ]
+                                },
+                    "null_name_ids":  [
+
+                                      ]
+                }
+}

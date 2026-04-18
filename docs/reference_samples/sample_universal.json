@@ -1,0 +1,221 @@
+{
+  "format": {
+    "name": "ldscript-json",
+    "major": 10,
+    "minor": 0
+  },
+  "output": {
+    "entry_symbol": "Reset_Handler"
+  },
+  "memory_regions": {
+    "items": [
+      {
+        "id": "r000001",
+        "name": "FLASH",
+        "origin_hex": "0x8000000",
+        "length_hex": "0x10000",
+        "attrs": {
+          "required": "xr",
+          "forbidden": "",
+          "flags_hex": "0x18",
+          "not_flags_hex": "0x0"
+        }
+      },
+      {
+        "id": "r000002",
+        "name": "RAM",
+        "origin_hex": "0x24000000",
+        "length_hex": "0x20000",
+        "attrs": {
+          "required": "rw",
+          "forbidden": "",
+          "flags_hex": "0x28",
+          "not_flags_hex": "0x0"
+        }
+      }
+    ],
+    "by_name": {
+      "FLASH": [
+        "r000001"
+      ],
+      "RAM": [
+        "r000002"
+      ]
+    },
+    "null_name_ids": []
+  },
+  "output_sections": {
+    "items": [
+      {
+        "id": "s000001",
+        "name": ".text",
+        "vma_region": "FLASH",
+        "lma_region": "FLASH",
+        "vma_hex": "0x8000000",
+        "lma_hex": "0x8000000",
+        "size_hex": "0x120",
+        "flags": {
+          "letters": "ax",
+          "hex": "0x13"
+        },
+        "script_subsections": [
+          "*(.text)",
+          "*(.text*)"
+        ]
+      },
+      {
+        "id": "s000002",
+        "name": ".data",
+        "vma_region": "RAM",
+        "lma_region": "FLASH",
+        "vma_hex": "0x24000000",
+        "lma_hex": "0x8000120",
+        "size_hex": "0x20",
+        "flags": {
+          "letters": "aw",
+          "hex": "0x23"
+        },
+        "script_subsections": [
+          "*(.data)",
+          "*(.data*)"
+        ]
+      }
+    ],
+    "by_name": {
+      ".text": [
+        "s000001"
+      ],
+      ".data": [
+        "s000002"
+      ]
+    },
+    "null_name_ids": []
+  },
+  "input_sections": {
+    "items": [
+      {
+        "id": "is000001",
+        "name": ".text.startup",
+        "discarded": false,
+        "output_section_id": "s000001",
+        "owner_file": "startup.o",
+        "value_hex": "0x8000000",
+        "size_hex": "0x80",
+        "output_offset_hex": "0x0",
+        "flags": {
+          "letters": "ax",
+          "hex": "0x13"
+        }
+      },
+      {
+        "id": "is000002",
+        "name": ".data",
+        "discarded": false,
+        "output_section_id": "s000002",
+        "owner_file": "main.o",
+        "value_hex": "0x24000000",
+        "size_hex": "0x20",
+        "output_offset_hex": "0x0",
+        "flags": {
+          "letters": "aw",
+          "hex": "0x23"
+        }
+      },
+      {
+        "id": "is000003",
+        "name": ".text.unused",
+        "discarded": true,
+        "output_section_id": null,
+        "owner_file": "dead.o",
+        "value_hex": null,
+        "size_hex": "0x20",
+        "output_offset_hex": null,
+        "flags": {
+          "letters": "ax",
+          "hex": "0x13"
+        }
+      }
+    ],
+    "by_name": {
+      ".text.startup": [
+        "is000001"
+      ],
+      ".data": [
+        "is000002"
+      ],
+      ".text.unused": [
+        "is000003"
+      ]
+    },
+    "null_name_ids": []
+  },
+  "discarded_input_sections": [
+    {
+      "input_section_id": "is000003",
+      "discard_reason": "gc_sections"
+    }
+  ],
+  "symbols": {
+    "items": [
+      {
+        "id": "v000001",
+        "name": "Reset_Handler",
+        "state": "defined",
+        "value_hex": "0x8000000",
+        "size_hex": null,
+        "section": ".text",
+        "output_section_id": "s000001",
+        "input_section_id": "is000001",
+        "script_defined": false
+      },
+      {
+        "id": "v000002",
+        "name": "_etext",
+        "state": "defined",
+        "value_hex": "0x8000120",
+        "size_hex": null,
+        "section": ".text",
+        "output_section_id": "s000001",
+        "input_section_id": null,
+        "script_defined": true
+      },
+      {
+        "id": "v000003",
+        "name": "_sidata",
+        "state": "defined",
+        "value_hex": "0x8000120",
+        "size_hex": null,
+        "section": "ABS",
+        "output_section_id": null,
+        "input_section_id": null,
+        "script_defined": true
+      },
+      {
+        "id": "v000004",
+        "name": "missing_symbol",
+        "state": "undefined",
+        "value_hex": null,
+        "size_hex": null,
+        "section": null,
+        "output_section_id": null,
+        "input_section_id": null,
+        "script_defined": false
+      }
+    ],
+    "by_name": {
+      "Reset_Handler": [
+        "v000001"
+      ],
+      "_etext": [
+        "v000002"
+      ],
+      "_sidata": [
+        "v000003"
+      ],
+      "missing_symbol": [
+        "v000004"
+      ]
+    },
+    "null_name_ids": []
+  }
+}
