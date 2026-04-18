@@ -194,6 +194,26 @@ Recommended linker package sanity set:
 - `ld.exe --help | findstr dump-script-json`
 - `objdump -p ld.exe` if you want to inspect runtime DLL dependencies
 
+### Optional deeper package sanity
+
+If you want one extra check before wiring the package into CubeIDE, inspect the
+runtime DLL imports of the packaged `ld.exe`.
+
+Example:
+
+```text
+objdump -p ld.exe
+```
+
+Healthy package signs usually include imports for runtime DLLs such as:
+
+- `libwinpthread-1.dll`
+- `libzstd.dll`
+
+Do not treat the exact full import table as a fixed contract across all future
+toolchain rebuilds, but these two runtime DLLs are expected for the currently
+maintained Windows MinGW packaging path.
+
 ## Typical Failure Modes
 
 ### CubeIDE still uses ST's original linker

@@ -175,6 +175,25 @@ pacman -Sy --noconfirm --needed \
 
 These package names match the current `ld_patcher` build backend.
 
+### Optional dependency only for historical canonical longpath debugging
+
+Most users do **not** need anything extra beyond the packages above.
+
+One narrow exception exists:
+
+- if you intentionally debug ST's original `liblongpath-win32/helper.py` flow
+- or if you use the preserved historical reference script
+  [`../scripts/manual_reference/build_st_ld_manual_canonical_longpath.sh`](../scripts/manual_reference/build_st_ld_manual_canonical_longpath.sh)
+
+then the Python environment visible from MSYS2 may also need:
+
+```bash
+python -m pip install python-magic
+```
+
+This is not required for the normal current `ld_patcher` GUI/CLI workflow and
+it is not required for the normal maintained manual fallback workflow.
+
 ### Automatic MSYS2 bootstrap in the program
 
 Current behavior:

@@ -1144,6 +1144,67 @@ That knowledge is preserved, but the current canonical working guidance is:
 - if you build by hand, start with `build_st_ld_manual.sh`
 - only reach for the longpath-specific variants if you are debugging that exact area
 
+### Historical Canonical ST Longpath Helper Flow
+
+The old `build_00` notes also preserved the exact `helper.py` flow used by ST's
+`liblongpath-win32` logic.
+
+You do **not** need this for the normal current workflow.
+
+Use it only when:
+
+- you are debugging ST's generated longpath wrapper path itself
+- you want to compare fallback behavior against the canonical wrapper-generated behavior
+- you are maintaining support for a new ST snapshot and need to inspect the original wrapper generation path
+
+The helper lives in the ST source tree at:
+
+```text
+<working-tree>\src\liblongpath-win32\helper.py
+```
+
+Typical MSYS2 location:
+
+```text
+/c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32/gnu-tools-for-stm32-13.3.rel1/src/liblongpath-win32/helper.py
+```
+
+From an `MSYS2 MinGW 64-bit` shell, the historical inspection commands are:
+
+```bash
+cd /c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32/gnu-tools-for-stm32-13.3.rel1/src/liblongpath-win32
+
+# Show which Win32 APIs the helper plans to wrap.
+python ./helper.py --list --triplet x86_64-w64-mingw32
+
+# Generate the wrapper files into the build tree.
+python ./helper.py \
+  --generate /c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32/gnu-tools-for-stm32-13.3.rel1/build/_build-ld-st-manual/liblongpath-win32 \
+  --triplet x86_64-w64-mingw32
+
+# Validate an installed tree after build/install.
+python ./helper.py \
+  --validate /c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32/gnu-tools-for-stm32-13.3.rel1/build/_install-ld-st-manual \
+  --triplet x86_64-w64-mingw32
+```
+
+If `helper.py` fails with a message about `python-magic`, install it in the
+Python environment visible from MSYS2:
+
+```bash
+python -m pip install python-magic
+```
+
+Practical rule:
+
+- for the maintained manual path, keep using `build_st_ld_manual.sh`
+- use `build_st_ld_manual_canonical_longpath.sh` only when you specifically need to exercise the wrapper-generated path
+- use the manual `pex-win32.c` fallback path described above for the verified day-to-day workflow
+
+The current canonical-longpath reference script is:
+
+- [`../scripts/manual_reference/build_st_ld_manual_canonical_longpath.sh`](../scripts/manual_reference/build_st_ld_manual_canonical_longpath.sh)
+
 ## `-fno-use-linker-plugin`
 
 Historical experiments showed that direct command-line tests could work with and
