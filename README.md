@@ -263,12 +263,10 @@ Everything needed for the active patch/build/verify flow is kept inside `ld_patc
 - `third_party/libzip`
   - vendored `libzip` source
 
-The active workflow no longer depends on sibling folders such as:
+The active workflow no longer depends on:
 
-- `build_04`
-- `json_patch`
-- `ld_sniffer`
-- `ld_viewer`
+- old numbered workspace build folders
+- the old top-level `json_patch` folder
 - any external STM32 sample project
 
 The workspace-specific documentation and manual knowledge now live directly

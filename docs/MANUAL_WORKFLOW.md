@@ -2,8 +2,8 @@
 
 This document is the canonical no-GUI workflow for `ld_patcher`.
 
-It replaces the old scattered `build_00..04` notes with one current path that
-matches the maintained application workflow.
+It is the single current manual path that matches the maintained application
+workflow.
 
 Before you start the real workflow, install the required software from:
 
@@ -314,7 +314,7 @@ Important:
 
 - use the fragment files from the same payload package that you used in Step 1
 - use the split fragment family listed below
-- do not use the legacy combined helpers `hooks/lexsup.c.fragment` or `hooks/ldlang.c.fragment`
+- do not use the older combined helpers `hooks/lexsup.c.fragment` or `hooks/ldlang.c.fragment`
 - after each insertion, compare your result with the `After insertion` examples below
 
 The active 13.3 and 14.3 recipes both use this fragment set:
@@ -1024,7 +1024,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 ```
 
-Optional historical real-project smoke script is still preserved as a reference file:
+Optional real-project smoke script is still preserved as a reference file:
 
 - [`../scripts/manual_reference/smoke_h7s_fiber_test.ps1`](../scripts/manual_reference/smoke_h7s_fiber_test.ps1)
 
@@ -1133,7 +1133,7 @@ The full CubeIDE hookup guidance lives in:
 
 ## Longpath Note
 
-The historical workspace had two build styles:
+There are two longpath-related build styles preserved in this repository:
 
 - canonical ST longpath-wrapper generation
 - fallback rebuild with direct include/fallback assumptions
@@ -1144,9 +1144,9 @@ That knowledge is preserved, but the current canonical working guidance is:
 - if you build by hand, start with `build_st_ld_manual.sh`
 - only reach for the longpath-specific variants if you are debugging that exact area
 
-### Historical Canonical ST Longpath Helper Flow
+### Optional Canonical ST Longpath Helper Flow
 
-The old `build_00` notes also preserved the exact `helper.py` flow used by ST's
+This section preserves the exact `helper.py` flow used by ST's
 `liblongpath-win32` logic.
 
 You do **not** need this for the normal current workflow.
@@ -1169,7 +1169,7 @@ Typical MSYS2 location:
 /c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32/gnu-tools-for-stm32-13.3.rel1/src/liblongpath-win32/helper.py
 ```
 
-From an `MSYS2 MinGW 64-bit` shell, the historical inspection commands are:
+From an `MSYS2 MinGW 64-bit` shell, the inspection commands are:
 
 ```bash
 cd /c/Users/admin/Documents/my_workspace/gnu/gnu-tools-for-stm32/gnu-tools-for-stm32-13.3.rel1/src/liblongpath-win32
@@ -1207,7 +1207,7 @@ The current canonical-longpath reference script is:
 
 ## `-fno-use-linker-plugin`
 
-Historical experiments showed that direct command-line tests could work with and
+Direct command-line tests showed that builds could work with and
 without `-fno-use-linker-plugin`.
 
 Current guidance:

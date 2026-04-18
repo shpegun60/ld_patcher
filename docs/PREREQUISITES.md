@@ -175,14 +175,14 @@ pacman -Sy --noconfirm --needed \
 
 These package names match the current `ld_patcher` build backend.
 
-### Optional dependency only for historical canonical longpath debugging
+### Optional dependency only for canonical longpath helper debugging
 
 Most users do **not** need anything extra beyond the packages above.
 
 One narrow exception exists:
 
 - if you intentionally debug ST's original `liblongpath-win32/helper.py` flow
-- or if you use the preserved historical reference script
+- or if you use the preserved reference script
   [`../scripts/manual_reference/build_st_ld_manual_canonical_longpath.sh`](../scripts/manual_reference/build_st_ld_manual_canonical_longpath.sh)
 
 then the Python environment visible from MSYS2 may also need:

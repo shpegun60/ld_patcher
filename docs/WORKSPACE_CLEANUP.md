@@ -47,92 +47,28 @@ Beginner-safe rule:
 That means the old helper/build folders no longer need to remain in the
 workspace just to preserve documentation.
 
-## Where The Old `build_00..04` Knowledge Went
+## Where The Old Numbered Build-Folder Knowledge Lives Now
 
-This is the practical crosswalk for the historical folders you asked about.
+If you used the old numbered build folders as ad-hoc documentation, the useful
+parts are now distributed into the maintained docs like this:
 
-### `build_00`
-
-What it used to contain:
-
-- detailed CubeIDE hookup notes
-- package sanity expectations
-- longpath fallback explanation
-- historical `helper.py` wrapper-generation notes
-
-Where that knowledge lives now:
-
-- [`CUBEIDE_INTEGRATION.md`](CUBEIDE_INTEGRATION.md)
-- [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
-- [`PREREQUISITES.md`](PREREQUISITES.md)
-
-### `build_01`
-
-What it used to contain:
-
-- fallback rebuild experiments
-- `-fno-use-linker-plugin` related checks
-- a rebuild script variant
-
-Where that knowledge lives now:
-
-- [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
-- [`../scripts/manual_reference/build_st_ld_manual_fallback.sh`](../scripts/manual_reference/build_st_ld_manual_fallback.sh)
-
-### `build_02`
-
-What it used to contain:
-
-- one-command build notes
-- patch-check helper
-- CubeIDE usage notes
-- old real-project smoke test
-
-Where that knowledge lives now:
-
-- [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
-- [`CUBEIDE_INTEGRATION.md`](CUBEIDE_INTEGRATION.md)
-- [`../scripts/manual_reference/check_manual_patch.ps1`](../scripts/manual_reference/check_manual_patch.ps1)
-- [`../scripts/manual_reference/smoke_h7s_fiber_test.ps1`](../scripts/manual_reference/smoke_h7s_fiber_test.ps1)
-
-### `build_03`
-
-What it used to contain:
-
-- later JSON-patch build notes
-- manual patch-check flow
-- CubeIDE notes
-- old smoke artifacts and sniffer-oriented comparison outputs
-
-Where that knowledge lives now:
-
-- [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
-- [`CUBEIDE_INTEGRATION.md`](CUBEIDE_INTEGRATION.md)
-- [`../docs/reference_samples/`](reference_samples/)
-- `ld_sniffer` should keep its own sniffer-specific knowledge separately
-
-### `build_04`
-
-What it used to contain:
-
-- the most polished old pre-`ld_patcher` build recipe
-- progress-marked build script
-- old real-project smoke verify
-- old packaged linker drop
-
-Where that knowledge lives now:
-
-- [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
-- [`CLI_REFERENCE.md`](CLI_REFERENCE.md)
-- [`CUBEIDE_INTEGRATION.md`](CUBEIDE_INTEGRATION.md)
-- [`../scripts/manual_reference/`](../scripts/manual_reference/)
+- manual patching, manual build, helper scripts, longpath notes, and verify flow:
+  - [`MANUAL_WORKFLOW.md`](MANUAL_WORKFLOW.md)
+- exact payload contents and insertion mapping:
+  - [`MANUAL_PATCH_PACKAGE.md`](MANUAL_PATCH_PACKAGE.md)
+- CubeIDE hookup and package sanity:
+  - [`CUBEIDE_INTEGRATION.md`](CUBEIDE_INTEGRATION.md)
+- required software and optional longpath-helper dependencies:
+  - [`PREREQUISITES.md`](PREREQUISITES.md)
+- sample JSON/reference artifacts:
+  - [`reference_samples/`](reference_samples/)
 
 Practical conclusion:
 
-- the useful human knowledge from `build_00..04` is now represented inside
-  `ld_patcher`
-- what mostly remains in those folders is historical output, historical test
-  artifacts, and old one-off workspace-specific layouts
+- the useful human guidance that used to be scattered across numbered build
+  folders now lives in the maintained `ld_patcher` docs and helper scripts
+- what mostly remains outside `ld_patcher` is generated output, temporary test
+  artifacts, and old workspace-specific layouts
 
 ## Usually Safe To Delete
 
@@ -183,7 +119,7 @@ So:
 2. keep `ld_sniffer`
 3. keep `ld_viewer`
 4. keep only source ZIPs/trees you still actively use
-5. remove old `build_00..04`
+5. remove old numbered build folders
 6. remove old top-level `json_patch`
 7. remove old root helper files if they are no longer needed outside
    `ld_patcher`

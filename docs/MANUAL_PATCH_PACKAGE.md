@@ -51,8 +51,8 @@ They are not compiled by themselves.
 
 Important:
 
-- both payload directories still contain older combined helper files such as `hooks/lexsup.c.fragment` and `hooks/ldlang.c.fragment`
-- those combined helpers are legacy reference material only
+- both payload directories still contain additional combined helper files such as `hooks/lexsup.c.fragment` and `hooks/ldlang.c.fragment`
+- those combined helpers are reference material only
 - the active application recipes use the split fragment family listed above
 - if you patch by hand and want parity with the current GUI/CLI implementation, use the split fragment family
 
