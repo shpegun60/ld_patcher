@@ -173,11 +173,6 @@ function Get-QtRootFromQMake {
 function Resolve-MingwMakePath {
     param([string]$ResolvedQMake)
 
-    $command = Get-Command 'mingw32-make.exe' -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($command -and $command.Source) {
-        return $command.Source
-    }
-
     $qtRoot = Get-QtRootFromQMake -ResolvedQMake $ResolvedQMake
     $toolCandidates = Get-ChildItem -LiteralPath (Join-Path $qtRoot 'Tools') -Directory -Filter 'mingw*' -ErrorAction SilentlyContinue |
         ForEach-Object { Join-Path $_.FullName 'bin\\mingw32-make.exe' } |
@@ -186,6 +181,11 @@ function Resolve-MingwMakePath {
 
     if ($toolCandidates) {
         return $toolCandidates[0]
+    }
+
+    $command = Get-Command 'mingw32-make.exe' -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($command -and $command.Source) {
+        return $command.Source
     }
 
     throw 'Unable to resolve mingw32-make from PATH or the Qt Tools directory.'

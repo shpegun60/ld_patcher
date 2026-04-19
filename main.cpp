@@ -107,6 +107,15 @@ int runCliValidate(const QString &inputPath)
             << "|" << check.description
             << "|" << check.detail << Qt::endl;
     }
+    out << "post_apply_contract="
+        << (validation.validation.postApplyContractSatisfied ? "true" : "false")
+        << Qt::endl;
+    for (const ValidationCheckResult &check : validation.validation.postApplyChecks) {
+        out << "post_apply_check=" << (check.passed ? "PASS" : "FAIL")
+            << "|" << (check.blocking ? "blocking" : "non-blocking")
+            << "|" << check.description
+            << "|" << check.detail << Qt::endl;
+    }
     for (const QString &line : validation.validation.warnings) {
         out << "warning.validation=" << line << Qt::endl;
     }

@@ -106,6 +106,7 @@ struct PatchRecipeData
     QString backupSuffix;
     QVector<ApplicabilityCheck> idempotencyRules;
     QVector<ApplicabilityCheck> postApplyChecks;
+    QString rollbackMode;
     QStringList notes;
 };
 
@@ -257,6 +258,8 @@ struct PatchValidationDetails
     QString errorMessage;
     QVector<ValidationCheckResult> checks;
     QVector<ValidationCheckResult> idempotencyChecks;
+    QVector<ValidationCheckResult> postApplyChecks;
+    bool postApplyContractSatisfied = false;
     QStringList warnings;
 };
 

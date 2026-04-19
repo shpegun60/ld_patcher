@@ -134,6 +134,32 @@ ValidationCheckResult makeCheckResult(bool passed,
     return result;
 }
 
+bool hasBlockingFailures(const QVector<ValidationCheckResult> &checks)
+{
+    for (const ValidationCheckResult &check : checks) {
+        if (!check.passed && check.blocking) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void appendNonBlockingFailuresAsWarnings(const QVector<ValidationCheckResult> &checks,
+                                         const QString &prefix,
+                                         QStringList *warnings)
+{
+    if (!warnings) {
+        return;
+    }
+
+    for (const ValidationCheckResult &check : checks) {
+        if (!check.passed && !check.blocking) {
+            warnings->append(QStringLiteral("%1%2: %3")
+                                 .arg(prefix, check.description, check.detail));
+        }
+    }
+}
+
 QStringList candidatePatchPackageRoots(const CatalogData &catalog, const PatchRecipeData &recipe)
 {
     const QString recipeFullPath = QDir(catalog.rootDir)
@@ -240,6 +266,13 @@ ValidationCheckResult evaluateApplicabilityCheck(const SourcePackage &source,
                                readError.isEmpty() ? location : readError);
     }
     const QRegularExpression regex(check.regex, QRegularExpression::MultilineOption);
+    if (!regex.isValid()) {
+        return makeCheckResult(false,
+                               check.blocking,
+                               description,
+                               QStringLiteral("Invalid regex '%1': %2")
+                                   .arg(check.regex, regex.errorString()));
+    }
     const int matchCount = countRegexMatches(text, regex);
     const int expectedCount = check.expectedCount;
 
@@ -279,6 +312,7 @@ PatchValidationDetails validatePatchRecipe(const CatalogData &catalog,
     details.recipeId = recipe.id;
     details.recipeDisplayName = recipe.displayName;
     details.sourceRootPath = sourceRootPath;
+    details.postApplyContractSatisfied = recipe.postApplyChecks.isEmpty();
 
     if (!recipe.supportedFamilies.isEmpty()
         && !recipe.supportedFamilies.contains(profile.family, Qt::CaseInsensitive)) {
@@ -294,7 +328,8 @@ PatchValidationDetails validatePatchRecipe(const CatalogData &catalog,
 
     const int totalValidationUnits = recipe.requiredFiles.size()
                                      + recipe.applicabilityChecks.size()
-                                     + recipe.idempotencyRules.size() + 1;
+                                     + recipe.idempotencyRules.size()
+                                     + recipe.postApplyChecks.size() + 1;
     int completedUnits = 1;
     reportProgress(progressCallback,
                    80,
@@ -345,17 +380,8 @@ PatchValidationDetails validatePatchRecipe(const CatalogData &catalog,
                        QStringLiteral("Checking already-patched markers..."));
     }
 
-    bool blockingFailure = false;
-    for (const ValidationCheckResult &check : std::as_const(details.checks)) {
-        if (!check.passed) {
-            if (check.blocking) {
-                blockingFailure = true;
-            } else {
-                details.warnings.append(QStringLiteral("%1: %2")
-                                            .arg(check.description, check.detail));
-            }
-        }
-    }
+    const bool blockingFailure = hasBlockingFailures(details.checks);
+    appendNonBlockingFailuresAsWarnings(details.checks, QString(), &details.warnings);
 
     if (!details.idempotencyChecks.isEmpty()) {
         int passedIdempotencyChecks = 0;
@@ -378,7 +404,36 @@ PatchValidationDetails validatePatchRecipe(const CatalogData &catalog,
             "The tree is treated as applicable in its already-patched state."));
     }
 
+    if (details.alreadyPatched) {
+        for (const ApplicabilityCheck &check : recipe.postApplyChecks) {
+            if (isCancelled(cancelToken)) {
+                details.ok = false;
+                details.errorMessage = QStringLiteral("Validation cancelled.");
+                return details;
+            }
+            details.postApplyChecks.append(evaluateApplicabilityCheck(source, check));
+            ++completedUnits;
+            reportProgress(progressCallback,
+                           80 + ((completedUnits * 20) / qMax(1, totalValidationUnits)),
+                           QStringLiteral("Checking post-apply contract..."));
+        }
+
+        appendNonBlockingFailuresAsWarnings(details.postApplyChecks,
+                                            QStringLiteral("Post-apply check: "),
+                                            &details.warnings);
+        details.postApplyContractSatisfied = !hasBlockingFailures(details.postApplyChecks);
+        if (!details.postApplyContractSatisfied) {
+            details.warnings.append(QStringLiteral(
+                "One or more blocking post-apply checks failed on the already-patched tree."));
+        }
+    } else {
+        completedUnits += recipe.postApplyChecks.size();
+    }
+
     details.applicable = !blockingFailure || details.alreadyPatched;
+    if (details.alreadyPatched && !details.postApplyContractSatisfied) {
+        details.applicable = false;
+    }
     details.supportLevel = details.applicable
                                ? (!profile.status.isEmpty() ? profile.status : recipe.status)
                                : QStringLiteral("unsupported");

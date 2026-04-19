@@ -27,8 +27,6 @@ public:
     bool containsNormalizedPath(const QString &normalizedPath) const;
     QByteArray readBytesByNormalizedPath(const QString &normalizedPath, QString *errorMessage) const;
     QString readTextByNormalizedPath(const QString &normalizedPath, QString *errorMessage) const;
-
-private:
     void close();
 
 private:

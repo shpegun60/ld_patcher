@@ -194,10 +194,72 @@ QString detectArchiveRootPrefix(const ZipArchive &archive, const QString &archiv
     return commonTopLevel;
 }
 
+QString comparableFsPath(const QString &path)
+{
+    QString normalized = QDir::fromNativeSeparators(QFileInfo(path).absoluteFilePath());
+#ifdef Q_OS_WIN
+    normalized = normalized.toLower();
+#endif
+    return QDir::cleanPath(normalized);
+}
+
+bool isPathInsideOrEqual(const QString &candidatePath, const QString &rootPath)
+{
+    const QString candidate = comparableFsPath(candidatePath);
+    const QString root = comparableFsPath(rootPath);
+    return !candidate.isEmpty()
+           && !root.isEmpty()
+           && (candidate == root || candidate.startsWith(root + QLatin1Char('/')));
+}
+
+bool resolveDirectoryMemberPath(const QString &rootPath,
+                                const QString &relativePath,
+                                QString *normalizedRelativePath,
+                                QString *resolvedPath,
+                                QString *errorMessage)
+{
+    QString normalized = QDir::fromNativeSeparators(relativePath.trimmed());
+    while (normalized.startsWith(QStringLiteral("./"))) {
+        normalized.remove(0, 2);
+    }
+
+    const QFileInfo relativeInfo(normalized);
+    if (relativeInfo.isAbsolute() || normalized.startsWith(QLatin1Char('/'))
+        || normalized.startsWith(QStringLiteral("//"))) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("Relative path must not be absolute: %1").arg(relativePath);
+        }
+        return false;
+    }
+
+    normalized = QDir::cleanPath(normalized);
+    if (normalized == QStringLiteral(".")) {
+        normalized.clear();
+    }
+
+    const QString root = QFileInfo(rootPath).absoluteFilePath();
+    const QString candidate = QDir(root).absoluteFilePath(normalized);
+    if (!isPathInsideOrEqual(candidate, root)) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("Relative path escapes the source root: %1").arg(relativePath);
+        }
+        return false;
+    }
+
+    if (normalizedRelativePath) {
+        *normalizedRelativePath = normalized;
+    }
+    if (resolvedPath) {
+        *resolvedPath = QDir::cleanPath(candidate);
+    }
+    return true;
+}
+
 } // namespace
 
 bool SourcePackage::open(const QString &inputPath, QString *errorMessage)
 {
+    m_zipArchive.close();
     m_kind = SourceKind::Unknown;
     m_inputPath.clear();
     m_rootName.clear();
@@ -231,6 +293,7 @@ bool SourcePackage::open(const QString &inputPath, QString *errorMessage)
         }
 
         if (m_zipArchive.entryCount() == 0) {
+            m_zipArchive.close();
             if (errorMessage) {
                 *errorMessage = QStringLiteral("ZIP archive appears to be empty: %1").arg(inputPath);
             }
@@ -298,11 +361,19 @@ bool SourcePackage::existsRelative(const QString &relativePath) const
         return false;
     }
 
-    const QString normalized = normalizeRelativePath(relativePath);
     if (m_kind == SourceKind::Directory) {
-        return QFileInfo::exists(QDir(m_inputPath).filePath(normalized));
+        QString resolvedPath;
+        if (!resolveDirectoryMemberPath(m_inputPath,
+                                        relativePath,
+                                        nullptr,
+                                        &resolvedPath,
+                                        nullptr)) {
+            return false;
+        }
+        return QFileInfo::exists(resolvedPath);
     }
 
+    const QString normalized = normalizeRelativePath(relativePath);
     if (m_kind == SourceKind::ZipArchive) {
         return m_zipArchive.containsNormalizedPath(archiveMemberPath(normalized));
     }
@@ -319,9 +390,16 @@ QByteArray SourcePackage::readBytesRelative(const QString &relativePath, QString
         return {};
     }
 
-    const QString normalized = normalizeRelativePath(relativePath);
     if (m_kind == SourceKind::Directory) {
-        QFile file(QDir(m_inputPath).filePath(normalized));
+        QString resolvedPath;
+        if (!resolveDirectoryMemberPath(m_inputPath,
+                                        relativePath,
+                                        nullptr,
+                                        &resolvedPath,
+                                        errorMessage)) {
+            return {};
+        }
+        QFile file(resolvedPath);
         if (!file.open(QIODevice::ReadOnly)) {
             if (errorMessage) {
                 *errorMessage = QStringLiteral("Failed to open %1: %2")
@@ -332,6 +410,7 @@ QByteArray SourcePackage::readBytesRelative(const QString &relativePath, QString
         return file.readAll();
     }
 
+    const QString normalized = normalizeRelativePath(relativePath);
     if (m_kind == SourceKind::ZipArchive) {
         return m_zipArchive.readBytesByNormalizedPath(archiveMemberPath(normalized), errorMessage);
     }
@@ -348,14 +427,24 @@ QString SourcePackage::readTextRelative(const QString &relativePath, QString *er
         return {};
     }
 
-    const QString normalized = normalizeRelativePath(relativePath);
+    QString normalized = normalizeRelativePath(relativePath);
+    QString resolvedPath;
+    if (m_kind == SourceKind::Directory) {
+        if (!resolveDirectoryMemberPath(m_inputPath,
+                                        relativePath,
+                                        &normalized,
+                                        &resolvedPath,
+                                        errorMessage)) {
+            return {};
+        }
+    }
     if (m_textCache.contains(normalized)) {
         return m_textCache.value(normalized);
     }
 
     QString text;
     if (m_kind == SourceKind::Directory) {
-        QFile file(QDir(m_inputPath).filePath(normalized));
+        QFile file(resolvedPath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             if (errorMessage) {
                 *errorMessage = QStringLiteral("Failed to open %1: %2")

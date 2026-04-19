@@ -85,7 +85,7 @@ CandidateScore evaluateProfile(const SourcePackage &source, const VersionProfile
         } else if (hint.type == QStringLiteral("file_regex")) {
             QString readError;
             const QString text = source.readTextRelative(hint.path, &readError);
-            if (text.isEmpty()) {
+            if (text.isNull()) {
                 result.warnings.append(readError.isEmpty()
                                            ? QStringLiteral("Could not read %1").arg(hint.path)
                                            : readError);
@@ -93,6 +93,11 @@ CandidateScore evaluateProfile(const SourcePackage &source, const VersionProfile
             }
 
             const QRegularExpression regex(hint.regex, QRegularExpression::MultilineOption);
+            if (!regex.isValid()) {
+                result.warnings.append(QStringLiteral("Invalid regex in detection hint for %1: %2")
+                                           .arg(hint.path, regex.errorString()));
+                continue;
+            }
             if (regex.match(text).hasMatch()) {
                 result.score += 10;
                 result.evidence.append(hint.description);

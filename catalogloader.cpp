@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSaveFile>
 
 namespace {
 
@@ -45,7 +46,7 @@ QJsonObject readJsonObject(const QString &path, QString *errorMessage)
 
 bool writeJsonObject(const QString &path, const QJsonObject &object, QString *errorMessage)
 {
-    QFile file(path);
+    QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         if (errorMessage) {
             *errorMessage = QStringLiteral("Failed to write %1: %2").arg(path, file.errorString());
@@ -57,6 +58,13 @@ bool writeJsonObject(const QString &path, const QJsonObject &object, QString *er
     if (file.write(bytes) != bytes.size()) {
         if (errorMessage) {
             *errorMessage = QStringLiteral("Failed to write full JSON payload into %1").arg(path);
+        }
+        return false;
+    }
+
+    if (!file.commit()) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("Failed to commit %1: %2").arg(path, file.errorString());
         }
         return false;
     }
@@ -86,6 +94,35 @@ QStringList parseStringArray(const QJsonObject &object, const QString &key)
         }
     }
     return values;
+}
+
+bool validateSchemaEnvelope(const QJsonObject &object,
+                            const QString &expectedType,
+                            const QString &filePath,
+                            QString *errorMessage)
+{
+    const QString actualType = object.value(QStringLiteral("schema_type")).toString();
+    if (actualType != expectedType) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("%1 is not a %2: %3")
+                                .arg(filePath, expectedType, actualType.isEmpty()
+                                                             ? QStringLiteral("<missing>")
+                                                             : actualType);
+        }
+        return false;
+    }
+
+    const int schemaVersion = object.value(QStringLiteral("schema_version")).toInt(0);
+    if (schemaVersion != 1) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("%1 has an unsupported schema_version: %2")
+                                .arg(filePath)
+                                .arg(schemaVersion);
+        }
+        return false;
+    }
+
+    return true;
 }
 
 VersionProfile parseProfile(const QString &filePath, const QJsonObject &object)
@@ -224,6 +261,8 @@ PatchRecipeData parsePatchRecipe(const QString &filePath, const QJsonObject &obj
     for (const QJsonValue &value : object.value(QStringLiteral("post_apply_checks")).toArray()) {
         recipe.postApplyChecks.append(parseApplicabilityCheck(value.toObject()));
     }
+    const QJsonObject rollbackStrategy = object.value(QStringLiteral("rollback_strategy")).toObject();
+    recipe.rollbackMode = rollbackStrategy.value(QStringLiteral("mode")).toString();
     for (const QJsonValue &value : object.value(QStringLiteral("notes")).toArray()) {
         recipe.notes.append(value.toString());
     }
@@ -303,6 +342,7 @@ VerifyRecipeData parseVerifyRecipe(const QString &filePath, const QJsonObject &o
 
 bool loadRecipeGroup(const QString &rootDir,
                      const QStringList &relativePaths,
+                     const QString &expectedType,
                      QHash<QString, RecipeSummary> *target,
                      QString *errorMessage)
 {
@@ -316,6 +356,9 @@ bool loadRecipeGroup(const QString &rootDir,
         }
         const QJsonObject object = readJsonObject(fullPath, errorMessage);
         if (object.isEmpty()) {
+            return false;
+        }
+        if (!validateSchemaEnvelope(object, expectedType, fullPath, errorMessage)) {
             return false;
         }
 
@@ -380,10 +423,7 @@ bool CatalogLoader::loadCatalog(const QString &catalogRoot, CatalogData *catalog
     if (root.isEmpty()) {
         return false;
     }
-    if (root.value(QStringLiteral("schema_type")).toString() != QStringLiteral("CatalogIndex")) {
-        if (errorMessage) {
-            *errorMessage = QStringLiteral("catalog.json is not a CatalogIndex: %1").arg(catalogPath);
-        }
+    if (!validateSchemaEnvelope(root, QStringLiteral("CatalogIndex"), catalogPath, errorMessage)) {
         return false;
     }
 
@@ -415,6 +455,9 @@ bool CatalogLoader::loadCatalog(const QString &catalogRoot, CatalogData *catalog
         if (object.isEmpty()) {
             return false;
         }
+        if (!validateSchemaEnvelope(object, QStringLiteral("VersionProfile"), fullPath, errorMessage)) {
+            return false;
+        }
 
         VersionProfile profile = parseProfile(relativePath, object);
         if (profile.id.isEmpty()) {
@@ -437,18 +480,21 @@ bool CatalogLoader::loadCatalog(const QString &catalogRoot, CatalogData *catalog
 
     if (!loadRecipeGroup(catalogRoot,
                          patchRecipePaths,
+                         QStringLiteral("PatchRecipe"),
                          &result.patchRecipes,
                          errorMessage)) {
         return false;
     }
     if (!loadRecipeGroup(catalogRoot,
                          buildRecipePaths,
+                         QStringLiteral("BuildRecipe"),
                          &result.buildRecipes,
                          errorMessage)) {
         return false;
     }
     if (!loadRecipeGroup(catalogRoot,
                          verifyRecipePaths,
+                         QStringLiteral("VerifyRecipe"),
                          &result.verifyRecipes,
                          errorMessage)) {
         return false;
@@ -520,6 +566,9 @@ bool CatalogLoader::loadPatchRecipe(const CatalogData &catalog,
     if (object.isEmpty()) {
         return false;
     }
+    if (!validateSchemaEnvelope(object, QStringLiteral("PatchRecipe"), fullPath, errorMessage)) {
+        return false;
+    }
 
     PatchRecipeData parsed = parsePatchRecipe(summary.filePath, object);
     if (parsed.id.isEmpty()) {
@@ -565,6 +614,9 @@ bool CatalogLoader::loadBuildRecipe(const CatalogData &catalog,
     if (object.isEmpty()) {
         return false;
     }
+    if (!validateSchemaEnvelope(object, QStringLiteral("BuildRecipe"), fullPath, errorMessage)) {
+        return false;
+    }
 
     BuildRecipeData parsed = parseBuildRecipe(summary.filePath, object);
     if (parsed.id.isEmpty()) {
@@ -608,6 +660,9 @@ bool CatalogLoader::loadVerifyRecipe(const CatalogData &catalog,
     const QString fullPath = QDir(catalog.rootDir).filePath(QStringLiteral("catalog/%1").arg(summary.filePath));
     const QJsonObject object = readJsonObject(fullPath, errorMessage);
     if (object.isEmpty()) {
+        return false;
+    }
+    if (!validateSchemaEnvelope(object, QStringLiteral("VerifyRecipe"), fullPath, errorMessage)) {
         return false;
     }
 

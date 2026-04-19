@@ -229,6 +229,24 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    if (m_cancelToken) {
+        m_cancelToken->store(true);
+    }
+
+    auto waitForWatcher = [](auto *watcher) {
+        if (watcher && watcher->isRunning()) {
+            watcher->future().waitForFinished();
+        }
+    };
+
+    waitForWatcher(m_analysisWatcher);
+    waitForWatcher(m_validationWatcher);
+    waitForWatcher(m_extractionWatcher);
+    waitForWatcher(m_applyWatcher);
+    waitForWatcher(m_buildWatcher);
+    waitForWatcher(m_verifyWatcher);
+    waitForWatcher(m_packageWatcher);
+
     delete ui;
 }
 
@@ -1133,6 +1151,13 @@ bool MainWindow::promptExtractPlan(ExtractPlan *plan)
                                  QStringLiteral("Choose a parent folder and provide a working directory name."));
             continue;
         }
+        if (dirName.contains(QLatin1Char('/')) || dirName.contains(QLatin1Char('\\'))
+            || dirName == QStringLiteral(".") || dirName == QStringLiteral("..")) {
+            QMessageBox::warning(this,
+                                 QStringLiteral("Invalid Working Directory Name"),
+                                 QStringLiteral("The working directory name must be a single folder name without path separators."));
+            continue;
+        }
 
         const QString destinationPath = QDir(parentDir).filePath(dirName);
         if (QFileInfo::exists(destinationPath)) {
@@ -1478,6 +1503,23 @@ void MainWindow::appendValidationSections(const ValidationResult &validation)
                                         .arg(state, check.description, check.detail));
         }
         appendSection(QStringLiteral("Already Patched Checks"), idempotencyLines);
+    }
+    if (!validation.validation.postApplyChecks.isEmpty()) {
+        QStringList postApplyLines;
+        for (const ValidationCheckResult &check : validation.validation.postApplyChecks) {
+            const QString state = check.passed ? QStringLiteral("PASS") : QStringLiteral("FAIL");
+            const QString severity = check.blocking ? QStringLiteral("blocking")
+                                                    : QStringLiteral("non-blocking");
+            postApplyLines.append(QStringLiteral("[%1] %2 | %3 | %4")
+                                      .arg(state, severity, check.description, check.detail));
+        }
+        appendSection(QStringLiteral("Post-Apply Checks"), postApplyLines);
+        appendSection(QStringLiteral("Post-Apply Contract"), {
+            QStringLiteral("Satisfied: %1").arg(
+                validation.validation.postApplyContractSatisfied
+                    ? QStringLiteral("yes")
+                    : QStringLiteral("no"))
+        });
     }
     if (!validation.validation.warnings.isEmpty()) {
         appendSection(QStringLiteral("Validation Warnings"), validation.validation.warnings);
@@ -2280,9 +2322,9 @@ void MainWindow::startBuildStep()
                      : QDir::toNativeSeparators(buildRootOverride))
     });
 
-    m_buildWatcher->setFuture(QtConcurrent::run([this, profileId = profile->id, buildRecipeId, workingRoot, buildRootOverride]() {
+    m_buildWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, cancelToken = m_cancelToken, profileId = profile->id, buildRecipeId, workingRoot, buildRootOverride]() {
         return WorkflowService::buildPatchedTree(
-            m_catalog,
+            catalog,
             profileId,
             buildRecipeId,
             workingRoot,
@@ -2298,7 +2340,7 @@ void MainWindow::startBuildStep()
                     appendLogLine(line);
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
@@ -2347,9 +2389,9 @@ void MainWindow::startVerifyStep()
     });
 
     const QStringList verifyRecipeIds = profile->verifyRecipeIds;
-    m_verifyWatcher->setFuture(QtConcurrent::run([this, profileId = profile->id, verifyRecipeIds, dropDir, cubeIdeRoot]() {
+    m_verifyWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, cancelToken = m_cancelToken, profileId = profile->id, verifyRecipeIds, dropDir, cubeIdeRoot]() {
         return WorkflowService::verifyBuild(
-            m_catalog,
+            catalog,
             profileId,
             verifyRecipeIds,
             dropDir,
@@ -2365,7 +2407,7 @@ void MainWindow::startVerifyStep()
                     appendLogLine(line);
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
@@ -2401,7 +2443,7 @@ void MainWindow::startPackageStep()
         QStringLiteral("Package dir: %1").arg(packageDir)
     });
 
-    m_packageWatcher->setFuture(QtConcurrent::run([this, sourceDropDir, packageDir]() {
+    m_packageWatcher->setFuture(QtConcurrent::run([this, cancelToken = m_cancelToken, sourceDropDir, packageDir]() {
         return WorkflowService::createCubeIdePackage(
             sourceDropDir,
             packageDir,
@@ -2416,7 +2458,7 @@ void MainWindow::startPackageStep()
                     appendLogLine(line);
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
@@ -2430,7 +2472,7 @@ void MainWindow::startAnalysisStep(WorkflowStepId id, const QString &path, const
     applyStatusVisualState(StatusVisualState::Running);
     setBusyState(true, message);
     setProgressPercent(0, QStringLiteral("%1 %p%").arg(message));
-    m_analysisWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, path]() {
+    m_analysisWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, cancelToken = m_cancelToken, path]() {
         return AnalysisService::analyzePath(
             catalog,
             path,
@@ -2440,7 +2482,7 @@ void MainWindow::startAnalysisStep(WorkflowStepId id, const QString &path, const
                     setStatusMessage(progressMessage);
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
@@ -2457,7 +2499,7 @@ void MainWindow::startValidationStep(WorkflowStepId id,
     applyStatusVisualState(StatusVisualState::Running);
     setBusyState(true, message);
     setProgressPercent(0, QStringLiteral("Validate... %p%"));
-    m_validationWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, path, selectedProfileId]() {
+    m_validationWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, cancelToken = m_cancelToken, path, selectedProfileId]() {
         return AnalysisService::validatePath(
             catalog,
             path,
@@ -2468,7 +2510,7 @@ void MainWindow::startValidationStep(WorkflowStepId id,
                     setStatusMessage(progressMessage);
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
@@ -2482,7 +2524,7 @@ void MainWindow::startExtraction(const QString &path, const ExtractPlan &plan)
     setBusyState(true, QStringLiteral("Extracting ZIP into working directory..."));
     setProgressPercent(0, QStringLiteral("Extracting archive... %p%"));
     m_lastExtractProgressLoggedPercent = -1;
-    m_extractionWatcher->setFuture(QtConcurrent::run([this, path, plan]() {
+    m_extractionWatcher->setFuture(QtConcurrent::run([this, cancelToken = m_cancelToken, path, plan]() {
         return WorkflowService::extractSource(
             path,
             plan,
@@ -2510,7 +2552,7 @@ void MainWindow::startExtraction(const QString &path, const ExtractPlan &plan)
                 }
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
@@ -2568,7 +2610,7 @@ void MainWindow::startApply(const QString &profileId, const QString &workingRoot
         QStringLiteral("Profile id: %1").arg(profileId),
         QStringLiteral("Working root: %1").arg(workingRootPath)
     });
-    m_applyWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, profileId, workingRootPath]() {
+    m_applyWatcher->setFuture(QtConcurrent::run([this, catalog = m_catalog, cancelToken = m_cancelToken, profileId, workingRootPath]() {
         return WorkflowService::applyPatch(
             catalog,
             profileId,
@@ -2584,7 +2626,7 @@ void MainWindow::startApply(const QString &profileId, const QString &workingRoot
                     appendLogLine(line);
                 }, Qt::QueuedConnection);
             },
-            m_cancelToken);
+            cancelToken);
     }));
 }
 
